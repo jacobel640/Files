@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/home_settings_header"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false">
+
+        <com.example.files.view.MaterialSwitchPreference
+            app:widgetLayout="@layout/material_switch_preference"
+            app:iconSpaceReserved="false"
+            app:key="SHOW_RECENT"
+            app:defaultValue="true"
+            app:summaryOff="@string/show_recent_summary_off"
+            app:summaryOn="@string/show_recent_summary_on"
+            app:title="@string/show_recent" />
+
+        <com.example.files.view.MaterialSwitchPreference
+            android:widgetLayout="@layout/material_switch_preference"
+            app:iconSpaceReserved="false"
+            app:key="SHOW_CATEGORIES"
+            app:defaultValue="true"
+            app:summaryOff="@string/show_categories_summary_off"
+            app:summaryOn="@string/show_categories_summary_on"
+            app:title="@string/show_categories" />
+
+        <com.example.files.view.MaterialSwitchPreference
+            android:widgetLayout="@layout/material_switch_preference"
+            app:iconSpaceReserved="false"
+            app:key="SHOW_FAVORITES"
+            app:defaultValue="true"
+            app:summaryOff="@string/show_favorites_summary_off"
+            app:summaryOn="@string/show_favorites_summary_on"
+            app:title="@string/show_favorites" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

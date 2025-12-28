@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:targetApi="25">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/sct_settings"
+        android:shortcutDisabledMessage="@string/no_files_found"
+        android:shortcutId="settings"
+        android:shortcutLongLabel="@string/settings"
+        android:shortcutShortLabel="@string/settings">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.example.files.MainActivity"
+            android:targetPackage="com.example.files">
+        </intent>
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.example.files.activities.SettingsActivity"
+            android:targetPackage="com.example.files" />
+
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/sct_search"
+        android:shortcutDisabledMessage="@string/no_files_found"
+        android:shortcutId="search"
+        android:shortcutLongLabel="@string/search"
+        android:shortcutShortLabel="@string/search">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.example.files.MainActivity"
+            android:targetPackage="com.example.files" >
+            <extra
+                android:name="shortcut"
+                android:value="search" />
+        </intent>
+
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/sct_recent"
+        android:shortcutDisabledMessage="@string/no_files_found"
+        android:shortcutId="recent"
+        android:shortcutLongLabel="@string/recent_files"
+        android:shortcutShortLabel="@string/recent_files">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.example.files.MainActivity"
+            android:targetPackage="com.example.files" >
+            <extra
+                android:name="shortcut"
+                android:value="recent" />
+        </intent>
+
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+</shortcuts>

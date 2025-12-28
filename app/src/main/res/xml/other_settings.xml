@@ -1,0 +1,36 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/other_settings_header"
+        app:iconSpaceReserved="false">
+
+        <com.example.files.view.MaterialSwitchPreference
+            app:widgetLayout="@layout/material_switch_preference"
+            app:iconSpaceReserved="false"
+            app:key="SHOW_HIDDEN_FILES"
+            app:defaultValue="false"
+            app:summaryOff="@string/show_hidden_files_summary_off"
+            app:summaryOn="@string/show_hidden_files_summary_on"
+            app:title="@string/show_hidden_files" />
+
+        <com.example.files.view.MaterialSwitchPreference
+            android:widgetLayout="@layout/material_switch_preference"
+            app:iconSpaceReserved="false"
+            app:key="SHOW_FULL_FILE_NAME"
+            app:defaultValue="false"
+            app:summaryOff="@string/show_full_file_name_summary_off"
+            app:summaryOn="@string/show_full_file_name_summary_on"
+            app:title="@string/show_full_file_name" />
+
+        <com.example.files.view.MaterialSwitchPreference
+            android:widgetLayout="@layout/material_switch_preference"
+            app:iconSpaceReserved="false"
+            app:key="SHOW_FILE_SIZE"
+            app:defaultValue="false"
+            app:summaryOff="@string/show_file_size_summary_off"
+            app:summaryOn="@string/show_file_size_summary_on"
+            app:title="@string/show_file_size" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

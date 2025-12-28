@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">קבצים</string>
+
+    <!-- Notes -->
+    <string name="permission_denied">הרשאות לא אושרו!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="main_categories_title">קטגוריות</string>
+    <string name="nothing_in_here">אין כאן כלום…</string>
+    <string name="gb">ג\"ב</string>
+    <string name="delete">מחק</string>
+    <string name="settings">הגדרות</string>
+    <string name="path">נתיב</string>
+    <string name="info">מידע</string>
+    <string name="external_storage">אחסון חיצוני %s</string>
+    <string name="internal_storage">אחסון פנימי</string>
+    <string name="create_new">צור חדש</string>
+    <string name="select_all">בחר הכל</string>
+    <string name="items">%s פריטים</string>
+    <string name="items_chosen">%s נבחר/ו</string>
+    <string name="chosen">נבחרו</string>
+    <string name="move">העבר</string>
+    <string name="move_here">העבר לכאן</string>
+    <string name="copy_action">העתק</string>
+    <string name="copy_here">העתק לכאן</string>
+    <string name="details">פרטים</string>
+    <string name="share">שתף</string>
+    <string name="size">גודל</string>
+    <string name="compressed">מכווצים</string>
+    <string name="downloads">הורדות</string>
+    <string name="installations">התקנות</string>
+    <string name="video">וידאו</string>
+    <string name="audio">אודיו</string>
+    <string name="pictures">תמונות</string>
+    <string name="documents">מסמכים</string>
+    <string name="recent_files">קבצים אחרונים</string>
+    <string name="cancel">ביטול</string>
+    <string name="create">צור</string>
+    <string name="last_edited">נערך לאחרונה</string>
+    <string name="contains">מכיל</string>
+    <string name="name">שם</string>
+    <string name="file">קובץ</string>
+    <string name="files">קבצים</string>
+    <string name="folders">תיקיות</string>
+    <string name="rename">שנה שם</string>
+    <string name="divider">מפריד</string>
+    <string name="include_extension">כלול סיומת</string>
+    <string name="create_folder">צור תיקייה</string>
+    <string name="new_folder">תיקייה חדשה</string>
+    <string name="create_file">צור קובץ</string>
+    <string name="new_file">קובץ חדש</string>
+    <string name="back">חזור</string>
+    <string name="home">בית</string>
+    <string name="one_folder">תיקייה אחת</string>
+    <string name="one_file">קובץ אחד</string>
+    <string name="delete_confirm">האם למחוק %s?</string>
+    <string name="loading">טוען…</string>
+    <string name="refresh">רענן</string>
+    <string name="close">סגור</string>
+    <string name="search">חיפוש</string>
+    <string name="show_all">הצג הכל</string>
+    <string name="move_to_background">המשך ברקע</string>
+    <string name="copying">מעתיק</string>
+    <string name="moving">מעביר</string>
+
+    <!-- Preference Titles -->
+    <string name="general_header">כללי</string>
+    <string name="about_header">אודות</string>
+    <string name="home_settings_header">הגדרות מסך הבית</string>
+    <string name="other_settings_header">הגדרות אחרות</string>
+    <string name="show_hidden_files">הצג קבצי מערכת מוסתרים</string>
+    <string name="show_full_file_name">להציג שמות קבצים מלאים</string>
+    <string name="show_file_size">להציג גודל קבצים</string>
+    <string name="show_recent">הצג אחרונים</string>
+    <string name="show_categories">הצג קטגוריות</string>
+    <string name="show_favorites">הצג מועדפים</string>
+    <string name="about_developer">אפליקציית סייר הקבצים הזאת פותחה ע"י יעקב אלחרר</string>
+
+    <!-- Preferences summary-on -->
+    <string name="show_hidden_files_summary_on">מציג קבצי מערכת מוסתרים</string>
+    <string name="show_full_file_name_summary_on">מציג את השם המלא של הקובץ</string>
+    <string name="show_file_size_summary_on">מציג גודל של תיקיות</string>
+    <string name="show_recent_summary_on">מציג את הקבצים האחרונים</string>
+    <string name="show_categories_summary_on">מציג את הקטגוריות</string>
+    <string name="show_favorites_summary_on">מציג את המועדפים</string>
+
+    <!-- Preferences summary-off -->
+    <string name="show_hidden_files_summary_off">מסתיר קבצי מערכת מוסתרים</string>
+    <string name="show_full_file_name_summary_off">מציג רק שורה אחת מתוך השם של הקובץ</string>
+    <string name="show_file_size_summary_off">מציג את מספר הפריטים בתיקיות</string>
+    <string name="show_recent_summary_off">מסתיר את הקבצים האחרונים</string>
+    <string name="show_categories_summary_off">מסתיר את הקטגוריות</string>
+    <string name="show_favorites_summary_off">מסתיר את המועדפים</string>
+
+    <!-- String-arrays -->
+    <string name="sort_name">שם</string>
+    <string name="sort_size">גודל</string>
+    <string name="sort_date">תאריך</string>
+    <string name="sort_type">סוג</string>
+
+    <string name="ascending_order">עולה</string>
+    <string name="descending_order">יורד</string>
+
+
+    <string name="apply">החל</string>
+    <string name="sort_by">מיין לפי</string>
+    <string name="no_files_found">לא נמצאו קבצים</string>
+    <string name="order">סדר</string>
+    <string name="prompt">Prompt</string>
+    <string name="deleting">מוחק</string>
+    <string name="copy_action_finished">פעולת העתקה הסתיימה</string>
+    <string name="move_action_finished">פעולת העברה הסתיימה</string>
+    <string name="delete_action_finished">פעולת מחיקה הסתיימה</string>
+    <string name="skip">דלג</string>
+    <string name="replace">החלף</string>
+    <string name="same_for_the_following">אותו דבר לכולם</string>
+    <string name="found_2_identical_files">נמצאו 2 קבצים זהים</string>
+    <string name="operations_progress">התקדמות של פעולה</string>
+    <string name="filters">פילטרים</string>
+    <string name="filter_three_days_ago">לפני 3 ימים</string>
+    <string name="filter_this_week">השבוע</string>
+    <string name="filter_this_month">החודש</string>
+    <string name="duration">משך</string>
+    <string name="title">כותרת</string>
+    <string name="artist">אמן</string>
+    <string name="album">אלבום</string>
+    <string name="resolution">רזולוציה</string>
+    <string name="category">קטגוריה</string>
+    <string name="time_title">זמן</string>
+    <string name="add_to_favorites">הוסף למועדפים</string>
+    <string name="remove_from_favorites">הסר ממועדפים</string>
+    <string name="confirm">אישור</string>
+    <string name="percent">אחוזים</string>
+    <string name="confirm_copy_to_clipboard">להעתיק את %s ללוח?</string>
+    <string name="move_to_location">עבור</string>
+    <string name="confirm_move_to_location">לעבור למיקום הזה?</string>
+    <string name="copied_to_clipboard">הועתק ללוח</string>
+    <string name="favorites">מועדפים</string>
+    <string name="storage_analyzer">מנתח אחסון</string>
+    <string name="open_with">פתח באמצעות</string>
+    <string name="full_name">הצג הכל</string>
+    <string name="copy_action_failed">פעולת העתקה נכשלה</string>
+    <string name="move_action_failed">פעולת העברה נכשלה</string>
+    <string name="delete_action_failed">פעולת מחיקה נכשלה</string>
+    <string name="archive_viewer_title">מציג הארכיונים</string>
+    <string name="audio_player_title">נגן אודיו</string>
+    <string name="merge">מזג</string>
+    <string name="this_directory_already_exists">הנתיב הזה כבר קיים</string>
+    <string name="do_you_want_to_merge_the_files_to_the_same_folder">אתה רוצה למזג את הקבצים לאותה תיקייה?</string>
+    <string name="insufficient_space_title">אין מספיק מקום!</string>
+    <string name="insufficient_space_alert">קבצים להעתקה: %s\nמקום פנוי: %s\nתצטרך עוד %s נוספים כדי לבצע את הפעולה הזאת!</string>
+    <string name="insufficient_space_hint">(מחשב 100 מ\"ב פחות כדי להשאיר מקום פנוי במכשיר)</string>
+    <string name="title_storage">אחסון</string>
+    <string name="error_existed_name_conflict">כבר קיים קובץ עם שם זהה!</string>
+    <string name="filter_today">היום</string>
+    <string name="title_files_self_update">עדכון עצמי של קבצים</string>
+    <string name="desc_downloading_new_version">מוריד גרסה חדשה</string>
+    <string name="pref_check_for_update">בדוק אם קיים עדכון</string>
+    <string name="downloading">מוריד…</string>
+    <string name="title_self_update">עדכון עצמי</string>
+    <string name="title_changelog">רשימת שינויים</string>
+    <string name="download_update">הורד עדכון</string>
+</resources>

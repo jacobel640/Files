@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.AppBarLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/appBarLayout"
+    android:paddingTop="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:expanded="false" >
+
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:id="@+id/collapsingToolbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:expandedTitleTextColor="@color/transparent"
+        app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/one_folder"
+            android:layout_gravity="top"
+            android:gravity="center"
+            android:textSize="35sp"
+            android:paddingTop="50dp"
+            android:paddingBottom="50dp"
+            android:textColor="@color/primary"
+            app:layout_collapseMode="parallax"
+            />
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="bottom"
+            android:background="@drawable/gradient_background_top"
+            app:navigationIcon="@drawable/back"
+            app:layout_collapseMode="pin">
+
+            <ImageButton
+                android:id="@+id/layout"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/view_list"
+                android:background="@drawable/round_only"
+                android:foreground="?android:selectableItemBackground"
+                android:contentDescription="@string/back" />
+
+            <ImageButton
+                android:id="@+id/search"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end|center_horizontal"
+                android:src="@drawable/search"
+                android:background="@drawable/round_only"
+                android:foreground="?android:selectableItemBackground"
+                android:contentDescription="@string/back" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_background_top"
+        app:layout_scrollFlags="scroll|enterAlways">
+
+        <include
+            layout="@layout/path_navigator"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            app:layout_collapseMode="pin"/>
+
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+</com.google.android.material.appbar.AppBarLayout>

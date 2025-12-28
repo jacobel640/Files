@@ -1,0 +1,18 @@
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:name="ic_launcher_foreground"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="500"
+    android:viewportHeight="500">
+    <path
+        android:name="path"
+        android:pathData="M 152.364 222.04 L 152.364 174.894 C 152.364 166.668 159.022 160 167.236 160 L 214.763 160 C 220.301 160 225.438 162.896 228.31 167.639 L 239.936 186.84 L 152.364 222.04"
+        android:fillColor="@color/primary"
+        android:strokeWidth="1"/>
+    <path
+        android:name="path_1"
+        android:pathData="M 251 187.22 L 322.481 187.22 C 337.79 187.22 350.2 199.69 350.2 215.072 L 350.2 305.347 C 350.2 320.962 337.602 333.62 322.062 333.62 L 179.485 333.62 C 164.195 333.62 151.8 321.166 151.8 305.803 L 151.8 215.493 C 151.8 199.878 164.398 187.22 179.938 187.22 L 251 187.22"
+        android:fillColor="@color/inverse_primary"
+        android:strokeWidth="1"/>
+</vector>

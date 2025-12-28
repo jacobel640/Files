@@ -1,0 +1,39 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        app:fragment="com.example.files.view.preferences.HomeSettingsFragment"
+        app:title="@string/home_settings_header"
+        app:iconSpaceReserved="false"
+        />
+
+    <Preference
+        app:fragment="com.example.files.view.preferences.OtherSettingsFragment"
+        app:title="@string/other_settings_header"
+        app:iconSpaceReserved="false"
+        />
+
+    <PreferenceCategory app:title="@string/about_header"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:icon="@mipmap/ic_launcher"
+            app:title="@string/files"
+            app:summary="@string/about_developer"
+            />
+
+        <Preference
+            app:summary="@string/pref_check_for_update"
+            app:key="update_check"
+            app:iconSpaceReserved="false"
+            />
+
+        <Preference
+            app:summary="בחר צבע ערכת נושא"
+            app:key="theme_picker"
+            app:iconSpaceReserved="false"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

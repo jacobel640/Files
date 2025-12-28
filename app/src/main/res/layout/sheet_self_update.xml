@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/primary_container"
+    android:padding="5dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_self_update"
+        android:gravity="center"
+        android:textSize="23sp"
+        android:layout_margin="15dp"
+        />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondary_container"
+        android:layout_margin="5dp">
+
+        <TextView
+            android:id="@+id/changelog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_changelog"
+            android:textColor="@color/on_secondary_container"
+            android:paddingTop="5dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp" />
+
+        <TextView
+            android:id="@+id/changelog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="30dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
+            android:text="@string/title_files_self_update"
+            android:textColor="@color/secondary"
+            android:fontFamily="serif-monospace"
+            android:background="@color/transparent"/>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="5dp">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:padding="8dp"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            style="@style/Widget.Material3.Button.TextButton"
+            />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/round_only"
+            android:backgroundTint="@color/divider"
+            android:layout_margin="5dp"
+            android:paddingTop="2dp"
+            />
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/download_update"
+            android:padding="8dp"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            style="@style/Widget.Material3.Button.TextButton"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

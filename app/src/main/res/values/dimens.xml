@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="round_corners">10dp</dimen>
+    <dimen name="stroke">1dp</dimen>
+    <dimen name="stroke_thin">0.5dp</dimen>
+    <dimen name="dialog_width">@dimen/match_parent</dimen>
+    <dimen name="dialog_height">@dimen/wrap_content</dimen>
+    <dimen name="card_size">150dp</dimen>
+    <dimen name="button_height">70dp</dimen>
+    <dimen name="bar_size">70dp</dimen>
+    <dimen name="name_text_size">15sp</dimen>
+    <dimen name="thumb_size">15dp</dimen>
+    <dimen name="thumb_stroke">2dp</dimen>
+    <dimen name="progress_bar_size">4dp</dimen>
+    <dimen name="background_bar_size">5dp</dimen>
+    <dimen name="background_bar_low_size">1dp</dimen>
+
+    <dimen name="wrap_content">-2px</dimen>
+    <dimen name="match_parent">-1px</dimen>
+    <dimen name="text_margin">16dp</dimen>
+</resources>

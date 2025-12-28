@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="60dp"
+    android:layout_height="50dp"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:id="@+id/action_view"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:animateLayoutChanges="true"
+        android:backgroundTint="@color/selected"
+        android:background="@drawable/round_small"
+        android:foreground="?android:selectableItemBackground"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="-6dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/name"
+                android:textStyle="bold"
+                android:paddingRight="1dp"
+                android:paddingLeft="1dp"
+                />
+
+            <TextView
+                android:id="@+id/action_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="false"
+                android:text="@string/copying"
+                android:textSize="12sp"
+                android:paddingRight="1dp"
+                android:paddingLeft="1dp"
+                />
+
+        </LinearLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:paddingRight="1dp"
+            android:paddingLeft="1dp"
+            android:indeterminate="true"
+            app:indicatorColor="@color/app_theme"
+            app:trackColor="@color/divider"
+            app:trackCornerRadius="8dp" />
+
+        <ImageView
+            android:id="@+id/finished"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/avd_check_uncheck"
+            android:scaleType="centerInside"
+            android:background="@color/selected"
+            />
+
+    </FrameLayout>
+
+</FrameLayout>

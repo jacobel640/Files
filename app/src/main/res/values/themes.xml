@@ -1,0 +1,85 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Files" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+        <item name="colorAccent">@color/primary_container</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorSecondaryContainer">@color/secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/on_secondary_container</item>
+        <item name="colorTertiary">@color/tertiary</item>
+        <item name="colorOnTertiary">@color/on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/on_tertiary_container</item>
+        <item name="colorError">@color/error</item>
+        <item name="colorErrorContainer">@color/error_container</item>
+        <item name="colorOnError">@color/on_error</item>
+        <item name="colorOnErrorContainer">@color/on_error_container</item>
+        <item name="backgroundColor">@color/background</item>
+        <item name="colorOnBackground">@color/on_background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorSurfaceContainer">@color/surface_variant</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item> <!--PopupWindow background-->
+        <item name="colorSurfaceContainerLow">@color/surface</item> <!--MaterialButton.Elevated background-->
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOnSurfaceInverse">@color/inverse_on_surface</item>
+        <item name="colorSurfaceInverse">@color/inverse_surface</item>
+        <item name="colorPrimaryInverse">@color/inverse_primary</item>
+        <item name="colorSurfaceContainerHighest">@color/primary_container</item>
+        <item name="colorSurfaceContainerLowest">@color/surface</item>
+        <item name="colorSurfaceContainerHigh">@color/surface</item>
+
+
+        <item name="colorPrimaryVariant">@color/background</item>
+
+        <item name="buttonTint">@color/primary_container</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondaryVariant">@color/app_theme</item>
+        <!-- Status bar color. -->
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">@color/transparent</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <!-- Customize your theme here. -->
+        <item name="android:textAlignment">gravity</item>
+        <item name="android:textDirection">locale</item>
+
+        <item name="android:textColorPrimary">@color/text</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textColorSecondary">@color/text</item>
+
+    </style>
+
+    <style name="AppThemeOverlay" parent="ThemeOverlay.Material3">
+        <item name="colorPrimary">?attr/dynamicColorPrimary</item>
+        <item name="colorPrimaryContainer">?attr/dynamicColorPrimaryContainer</item>
+    </style>
+
+<!--    <style name="PopupMenu" parent="Base.Widget.MaterialComponents.PopupMenu">-->
+<!--        <item name="listMenuViewStyle">@drawable/round</item>-->
+<!--        <item name="popupMenuBackground">@drawable/round</item>-->
+<!--    </style>-->
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up_animation</item>
+        <item name="android:windowExitAnimation">@anim/slide_down_animation</item>
+    </style>
+
+    <!-- Animation for dialog box -->
+    <style name="DialogSlideAnim" parent="@android:style/Theme.Dialog">
+        <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
+    </style>
+
+<!--    <style name="Files.Material3.CardView" parent="Widget.Material3.CardView.Filled">-->
+<!--        <item name="cardCornerRadius">25dp</item>-->
+<!--        <item name="strokeColor">@color/transparent</item>-->
+<!--    </style>-->
+
+</resources>

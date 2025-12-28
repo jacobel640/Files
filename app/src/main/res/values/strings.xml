@@ -1,0 +1,165 @@
+<resources>
+    <string name="app_name">Files</string>
+
+    <!-- Notes -->
+    <string name="permission_denied">Permission is Denied!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="main_categories_title">Categories</string>
+    <string name="nothing_in_here">Nothing in here…</string>
+    <string name="gb">"GB"</string>
+    <string name="delete">Delete</string>
+    <string name="settings">Settings</string>
+    <string name="path">Path</string>
+    <string name="file">File</string>
+    <string name="info">Info</string>
+    <string name="external_storage">External Storage %s</string>
+    <string name="internal_storage">Internal Storage</string>
+    <string name="create_new">Create New</string>
+    <string name="select_all">Select All</string>
+    <string name="items">%s Items</string>
+    <string name="items_chosen">%s Chosen</string>
+    <string name="chosen">Chosen</string>
+    <string name="move">Move</string>
+    <string name="move_here">Move Here</string>
+    <string name="copy_action">Copy</string>
+    <string name="copy_here">Copy Here</string>
+    <string name="details">Details</string>
+    <string name="share">Share</string>
+    <string name="size">Size</string>
+    <string name="compressed">Compressed</string>
+    <string name="downloads">Downloads</string>
+    <string name="installations">Apk\'s</string>
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+    <string name="pictures">Pictures</string>
+    <string name="documents">Documents</string>
+    <string name="recent_files">Last Files</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+    <string name="last_edited">Last Edited</string>
+    <string name="contains">Contains</string>
+    <string name="name">Name</string>
+    <string name="files">Files</string>
+    <string name="folders">Folders</string>
+    <string name="rename">Rename</string>
+    <string name="divider">Divider</string>
+    <string name="include_extension">Include Extension</string>
+    <string name="create_folder">צור תיקייה</string>
+    <string name="new_folder">תיקייה חדשה</string>
+    <string name="create_file">צור קובץ</string>
+    <string name="new_file">קובץ חדש</string>
+    <string name="back">Back</string>
+    <string name="home">Home</string>
+    <string name="one_folder">One Folder</string>
+    <string name="one_file">One File</string>
+    <string name="delete_confirm">Delete %s?</string>
+    <string name="loading">Loading…</string>
+    <string name="refresh">Refresh</string>
+    <string name="close">Close</string>
+    <string name="search">search</string>
+    <string name="show_all">Show All</string>
+    <string name="move_to_background">Move to background</string>
+    <string name="copying">Copying</string>
+    <string name="moving">Moving</string>
+
+    <!-- Preference Titles -->
+    <string name="general_header">General</string>
+    <string name="other_settings_header">OtherSettings</string>
+    <string name="about_header">About</string>
+    <string name="home_settings_header">Home Settings</string>
+    <string name="show_hidden_files">Show Hidden Files</string>
+    <string name="show_full_file_name">Show full file names</string>
+    <string name="show_file_size">Show file size</string>
+    <string name="show_recent">Show Recent</string>
+    <string name="show_categories">Show Categories</string>
+    <string name="show_favorites">Show Favorites</string>
+    <string name="about_developer">This files manager app created by Jacob Elcharar</string>
+
+    <!-- Preferences summary-on -->
+    <string name="show_hidden_files_summary_on">Showing Hidden System Files</string>
+    <string name="show_full_file_name_summary_on">Showing full file names</string>
+    <string name="show_file_size_summary_on">Showing file size</string>
+    <string name="show_recent_summary_on">Showing Recent section</string>
+    <string name="show_categories_summary_on">Showing Categories section</string>
+    <string name="show_favorites_summary_on">Showing Favorites section</string>
+
+    <!-- Preferences summary-off -->
+    <string name="show_hidden_files_summary_off">Hiding Hidden System Files</string>
+    <string name="show_full_file_name_summary_off">Show full file names</string>
+    <string name="show_file_size_summary_off">Show file size</string>
+    <string name="show_recent_summary_off">Hiding Recent section</string>
+    <string name="show_categories_summary_off">Hiding Categories section</string>
+    <string name="show_favorites_summary_off">Hiding Favorites section</string>
+
+    <!-- String-arrays -->
+    <string name="sort_name">Name</string>
+    <string name="sort_size">Size</string>
+    <string name="sort_date">Date</string>
+    <string name="sort_type">Type</string>
+
+    <string name="ascending_order">Increase</string>
+    <string name="descending_order">Decrease</string>
+
+
+    <string name="apply">Apply</string>
+    <string name="sort_by">Sort By</string>
+    <string name="no_files_found">No Files Found</string>
+    <string name="order">Order</string>
+    <string name="prompt">Prompt</string>
+    <string name="deleting">Deleting</string>
+    <string name="copy_action_finished">Copy action finished</string>
+    <string name="move_action_finished">Move action finished</string>
+    <string name="delete_action_finished">Delete action finished</string>
+    <string name="skip">Skip</string>
+    <string name="replace">Replace</string>
+    <string name="same_for_the_following">Same for the following</string>
+    <string name="found_2_identical_files">Found 2 identical files</string>
+    <string name="operations_progress">Operations progress</string>
+    <string name="filters">Filters</string>
+    <string name="filter_today">Today</string>
+    <string name="filter_three_days_ago">last 3 days</string>
+    <string name="filter_this_week">this Week</string>
+    <string name="filter_this_month">this Month</string>
+    <string name="duration">Duration</string>
+    <string name="title">Title</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+    <string name="resolution">Resolution</string>
+    <string name="category">category</string>
+    <string name="time_title">Time</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
+    <string name="confirm">OK</string>
+    <string name="percent">percent</string>
+    <string name="confirm_copy_to_clipboard">Copy the %s to Clipboard?</string>
+    <string name="move_to_location">Move</string>
+    <string name="confirm_move_to_location">Move to This Location?</string>
+    <string name="copied_to_clipboard">Copied To Clipboard</string>
+    <string name="favorites">Favorites</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="storage_analyzer">Storage Analyzer</string>
+    <string name="open_with">Open with</string>
+    <string name="full_name">Show Full Name</string>
+    <string name="copy_action_failed">Copy Action Failed</string>
+    <string name="move_action_failed">Move Action Failed</string>
+    <string name="delete_action_failed">Delete Action Failed</string>
+    <string name="archive_viewer_title">Archive Viewer</string>
+    <string name="audio_player_title">Audio Player</string>
+    <string name="merge">Merge</string>
+    <string name="this_directory_already_exists">This directory already exists</string>
+    <string name="do_you_want_to_merge_the_files_to_the_same_folder">Do you want to merge the files to the same folder?</string>
+    <string name="insufficient_space_title">Insufficient space!</string>
+    <string name="insufficient_space_alert">Files to copy: %s\nFree Space: %s\nYou need more %s to proceed!</string>
+    <string name="insufficient_space_hint">(leaving extra 100 MB space on the storage empty)</string>
+    <string name="title_storage">Storage</string>
+    <string name="error_existed_name_conflict">Another file with the same name already exist!</string>
+    <string name="title_files_self_update">Files Self Update</string>
+    <string name="desc_downloading_new_version">downloading new version</string>
+    <string name="pref_check_for_update">Check for Update</string>
+    <string name="downloading">Downloading...</string>
+    <string name="title_self_update">Self Update</string>
+    <string name="title_changelog">Changelog</string>
+    <string name="download_update">Download Update</string>
+</resources>

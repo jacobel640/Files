@@ -1,0 +1,303 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/mainLayout"
+    android:background="@color/background"
+    android:clickable="false"
+    android:focusable="false"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/background"
+        android:clickable="true"
+        android:focusable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            tools:ignore="UselessParent">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                tools:ignore="NestedWeights">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_margin="10dp"
+                    android:layout_marginBottom="15dp">
+
+                    <ImageButton
+                        android:id="@+id/search"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="end|center_horizontal"
+                        android:src="@drawable/search"
+                        android:background="@drawable/round_only"
+                        android:foreground="?android:selectableItemBackground"
+                        android:contentDescription="@string/back" />
+
+                </androidx.appcompat.widget.Toolbar>
+
+                <!-- change ScrollView layout_height="match_parent" to "wrap_content"
+                for centering the layouts in the screen -->
+                <LinearLayout
+                    android:id="@+id/linear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="65dp"
+                    android:background="@drawable/round_only"
+                    android:orientation="vertical"
+                    >
+
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/nScrollView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/round_only"
+                        android:gravity="center_vertical"
+                        android:fillViewport="true"
+                        >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="10dp"
+                            android:orientation="vertical"
+                            >
+
+                            <LinearLayout
+                                android:id="@+id/recent_section"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center_vertical"
+                                android:elevation="1dp"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="10dp"
+                                    android:elevation="0dp"
+                                    android:padding="3dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_weight="1"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="15sp"
+                                        android:padding="12dp"
+                                        android:textColor="@color/on_primary_container"
+                                        android:text="@string/recent_files"
+                                        />
+
+                                    <Button
+                                        android:id="@+id/show_all"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:layout_marginEnd="5dp"
+                                        android:layout_gravity="center_vertical"
+                                        android:text="@string/show_all"
+                                        style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                                        />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/categories_section"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:elevation="1dp"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="10dp"
+                                    android:padding="3dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:padding="12dp"
+                                        android:gravity="start"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/on_primary_container"
+                                        android:text="@string/main_categories_title"
+                                        />
+
+                                </LinearLayout>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="10dp"
+                                    android:clickable="false"
+                                    android:focusable="false"
+                                    app:strokeColor="@color/transparent"
+                                    app:cardElevation="1dp">
+
+                                    <androidx.recyclerview.widget.RecyclerView
+                                        android:id="@+id/rv_categories"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:columnOrderPreserved="true"
+                                        android:overScrollMode="never"
+                                        tools:itemCount="6"
+                                        tools:listitem="@layout/item_category"
+                                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                        app:spanCount="3"
+                                        />
+
+                                </com.google.android.material.card.MaterialCardView>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/storage_section"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:elevation="1dp"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="10dp"
+                                    android:padding="3dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:padding="12dp"
+                                        android:gravity="start"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/on_primary_container"
+                                        android:text="@string/title_storage"
+                                        />
+
+                                </LinearLayout>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="10dp"
+                                    app:cardElevation="1dp"
+                                    app:strokeColor="@color/transparent"
+                                    android:background="@drawable/round_small"
+                                    android:backgroundTint="@color/background">
+
+                                    <LinearLayout
+                                        android:id="@+id/lvStorage"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical"
+                                        tools:listitem="@layout/item_file_card">
+
+                                    </LinearLayout>
+
+                                </com.google.android.material.card.MaterialCardView>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/favorites_section"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:elevation="1dp"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="10dp"
+                                    android:padding="3dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:padding="12dp"
+                                        android:gravity="start"
+                                        android:textSize="15sp"
+                                        android:textColor="@color/on_primary_container"
+                                        android:text="@string/favorites"
+                                        />
+
+                                </LinearLayout>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="10dp"
+                                    app:cardElevation="1dp"
+                                    app:strokeColor="@color/transparent">
+
+                                    <LinearLayout
+                                        android:id="@+id/lvFavorites"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical"
+                                        tools:listitem="@layout/item_file_card">
+
+                                    </LinearLayout>
+
+                                </com.google.android.material.card.MaterialCardView>
+
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp" />
+
+                        </LinearLayout>
+
+                    </androidx.core.widget.NestedScrollView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@color/background"
+                android:id="@+id/frameLayout"
+                android:clickable="false"
+                android:focusable="false">
+
+                <include layout="@layout/bottom_action_bar" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

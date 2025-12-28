@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/transparent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="14dp"
+        android:layout_height="12dp"
+        app:tint="@color/on_primary_container"
+        android:src="@drawable/path_arrow"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/btnPath"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:padding="5dp"
+        android:background="@drawable/round_only"
+        android:foreground="?android:selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/path"
+        android:textSize="14sp"
+        android:textColor="@color/on_primary_container"
+        android:textAllCaps="false"
+        />
+
+</LinearLayout>

@@ -1,0 +1,151 @@
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Theme.Material3.DayNight.Dialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:clickable="false"
+    android:gravity="center"
+    android:layout_margin="20dp"
+    android:layout_gravity="bottom"
+    android:focusable="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        >
+
+        <TextView
+            android:id="@+id/dtv_title"
+            android:gravity="start"
+            android:text="@string/rename"
+            android:textSize="23sp"
+            android:textColor="@color/text"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <ScrollView
+            android:id="@+id/dialog_sv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/text_input"
+                        android:hint="@string/name"
+                        android:selectAllOnFocus="true"
+                        android:gravity="start"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        tools:ignore="Autofill" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/rename_options"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:checkedButton="@id/create_folder">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/include_ext"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/include_extension"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/full_name"
+                        android:text="@string/full_name"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:id="@+id/hints"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/info"
+                    android:textColor="@android:color/holo_red_light"
+                    android:visibility="gone"
+                    />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:padding="8dp"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                style="@style/Widget.Material3.Button.TextButton"
+                />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/round_only"
+                android:backgroundTint="@color/divider"
+                android:layout_margin="5dp"
+                android:paddingTop="2dp"
+                />
+
+            <Button
+                android:id="@+id/btn_create"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/rename"
+                android:padding="8dp"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                style="@style/Widget.Material3.Button.TextButton"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_theme">#00668B</color>
+    <color name="seed">@color/app_theme</color>
+    <color name="primary">@color/app_theme</color>
+    <color name="on_primary">#F9FCFF</color>
+    <color name="primary_container">#C1E8FF</color>
+    <color name="on_primary_container">#001E2C</color>
+    <color name="secondary">#4E616C</color>
+    <color name="on_secondary">#F9FCFF</color>
+    <color name="secondary_container">#D1E5F4</color>
+    <color name="on_secondary_container">#091E28</color>
+    <color name="tertiary">#605A7C</color>
+    <color name="on_tertiary">#FFFBFF</color>
+    <color name="tertiary_container">#E6DEFF</color>
+    <color name="on_tertiary_container">#1D1736</color>
+    <color name="error">#BA1A1A</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="error_container">#FFDAD6</color>
+    <color name="on_error_container">#410002</color>
+    <color name="background">#F9FCFF</color>
+    <color name="on_background">#1B1B1F</color>
+    <color name="surface">#F9FCFF</color>
+    <color name="on_surface">#1B1B1F</color>
+    <color name="surface_variant">#E8F3F8</color>
+    <color name="on_surface_variant">#44464F</color>
+    <color name="outline">#757780</color>
+    <color name="inverse_on_surface">#F2F0F4</color>
+    <color name="inverse_surface">#303034</color>
+    <color name="inverse_primary">#76D1FF</color>
+    <color name="shadow">#000000</color>
+    <color name="surface_tint">#2259BF</color>
+    <color name="outline_variant">#C5C6D0</color>
+    <color name="scrim">#000000</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="transparent_dark">#80EAEAEA</color>
+    <color name="transparent_gradient">#80FFFFFF</color>
+    <color name="pressed">#989898</color>
+    <color name="selected">@color/primary_container</color>
+    <color name="app_bar">#FFFFFF</color>
+    <color name="path_text">#DADADD</color>
+    <color name="text">#0E0E0E</color>
+    <color name="divider">#CCCCCC</color>
+    <color name="grey">#818181</color>
+
+    <color name="ctg_archive">#FFAB2E</color>
+    <color name="ctg_video">#C66BE8</color>
+    <color name="ctg_photo">#FF7672</color>
+    <color name="ctg_downloads">#009196</color>
+    <color name="ctg_audio">#2196F3</color>
+    <color name="ctg_apk">#35B970</color>
+    <color name="ext_file">#C8C8C8</color>
+    <color name="ext_file_corner">#8D8D8D</color>
+    <color name="ext_excel_badge">#0c7238</color>
+    <color name="ext_excel_1">#29c27f</color>
+    <color name="ext_excel_2">#19ac65</color>
+    <color name="ext_excel_3">#129652</color>
+    <color name="ext_excel_4">#27663f</color>
+    <color name="ext_excel_5">#169154</color>
+    <color name="ext_excel_6">#0c8045</color>
+    <color name="ext_excel_7">#17472a</color>
+    <color name="ext_excel_8">#18482a</color>
+</resources>

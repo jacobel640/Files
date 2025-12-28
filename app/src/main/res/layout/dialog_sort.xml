@@ -1,0 +1,168 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/dialog_width"
+    android:layout_height="@dimen/dialog_height"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:ignore="MissingDefaultResource">
+
+    <TextView
+        android:id="@+id/sort_title"
+        android:gravity="start"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/sort_by"
+        android:textSize="20sp"
+        android:textColor="@color/text"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/sort_selection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@id/sort_by_name">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sort_by_name"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp"
+                android:text="@string/name"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sort_by_size"
+                android:text="@string/size"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sort_by_date"
+                android:text="@string/sort_date"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sort_by_type"
+                android:text="@string/sort_type"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:text="@string/order"
+            />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/order_selection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@id/ascending_order">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/ascending_order"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/ascending_order"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/descending_order"
+                android:text="@string/descending_order"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/sort_cancel"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:padding="8dp"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                style="@style/Widget.Material3.Button.TextButton"
+                />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/round_only"
+                android:backgroundTint="@color/divider"
+                android:layout_margin="5dp"
+                android:paddingTop="2dp"
+                />
+
+            <Button
+                android:id="@+id/sort_apply"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/apply"
+                android:padding="8dp"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                style="@style/Widget.Material3.Button.TextButton"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

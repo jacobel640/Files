@@ -1,0 +1,124 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:paddingStart="30dp"
+    android:paddingEnd="30dp"
+    android:background="@drawable/round_small"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:layout_marginBottom="20dp"
+    android:layout_gravity="bottom">
+
+    <TextView
+        android:id="@+id/title"
+        android:gravity="start"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/this_directory_already_exists"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:gravity="start"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:text="@string/do_you_want_to_merge_the_files_to_the_same_folder"
+        android:textSize="16sp"
+        android:textColor="@color/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <com.google.android.material.internal.BaselineLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/grey"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        />
+
+    <TextView
+        android:id="@+id/folder_name"
+        android:gravity="start"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:text="@string/show_full_file_name_summary_on"
+        android:textSize="16sp"
+        android:textColor="@color/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <com.google.android.material.internal.BaselineLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/grey"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        />
+
+    <CheckBox
+        android:id="@+id/same_for_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:button="@drawable/checkbox"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:text="@string/same_for_the_following"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/rename"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/rename"
+            android:padding="8dp"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            style="@style/Widget.Material3.Button.TextButton"
+            />
+
+        <Button
+            android:id="@+id/merge"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/merge"
+            android:padding="8dp"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            style="@style/Widget.Material3.Button.TextButton"
+            />
+
+        <Button
+            android:id="@+id/skip"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/skip"
+            android:padding="8dp"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            style="@style/Widget.Material3.Button.TextButton"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
