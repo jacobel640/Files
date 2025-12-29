@@ -40,6 +40,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -88,6 +89,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class FragmentBase extends Fragment {
 
@@ -647,17 +649,42 @@ public abstract class FragmentBase extends Fragment {
     }
 
     protected void trigger(int position) {
-        final int[] finished = {0};
-        for (int i = position; i < position+3 && i < jFileAdapter.getItemCount(); i++) {
-            if (jFileAdapter.jFileList.get(i).isSizeDone()) continue;
-            jFileAdapter.jFileList.get(i).triggerSizeLoading(() -> {
-                finished[0]++;
-                if (sort == 1) binding.rvFiles.post(() -> new DialogSort().sortAndNotify(jFileAdapter));
-                if (finished[0] == 3) {
-                    trigger(position+3);
+        if (position >= jFileAdapter.getItemCount()) return;
+
+        int end = Math.min(position + 3, jFileAdapter.getItemCount());
+
+        AtomicInteger pending = new AtomicInteger(0);
+
+        for (int i = position; i < end; i++) {
+            JFile file = jFileAdapter.jFileList.get(i);
+
+            if (!file.isDirectory()) continue;
+            if (file.isSizeReady()) continue;
+
+            pending.incrementAndGet();
+
+            file.setSizeLoadListener(size -> {
+                if (pending.decrementAndGet() == 0) {
+                    onBatchFinished(end);
                 }
             });
+
+            file.loadSizeIfNeeded();
         }
+
+        if (pending.get() == 0) {
+            onBatchFinished(end);
+        }
+    }
+
+    private void onBatchFinished(int nextPosition) {
+        if (!isVisible()) return;
+        if (sort == 1) {
+            jFileAdapter.onSizeBatchUpdated();
+        }
+
+        new Handler(Looper.getMainLooper())
+                .postDelayed(() -> trigger(nextPosition), 50);
     }
 
     public void select(String itemPath) {

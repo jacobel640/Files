@@ -10,11 +10,14 @@ import static com.example.files.Statics.openFile;
 import static com.example.files.Statics.openFolder;
 import static com.example.files.Statics.openRecent;
 import static com.example.files.Statics.selectedJFiles;
+import static com.example.files.Statics.showFileSize;
 import static com.example.files.fragments.FragmentBase.FragmentType.MAIN;
 import static com.example.files.fragments.FragmentBase.FragmentType.SEARCH;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Vibrator;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -31,7 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.files.listeners.OnDelayLoadReady;
+import com.example.files.actions.DialogSort;
 import com.example.files.utils.FileIcon;
 import com.example.files.fragments.FragmentBase.FragmentType;
 import com.example.files.models.JFile;
@@ -41,6 +44,7 @@ import com.example.files.utils.Filters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class JFileAdapter extends RecyclerView.Adapter<ViewHolder> implements SectionIndexer {
     Vibrator vibrator;
@@ -108,21 +112,15 @@ public class JFileAdapter extends RecyclerView.Adapter<ViewHolder> implements Se
                     setHighLightedText(holder.fileName, part);
                 }
                 holder.size.setText(currentJFile.getCountItems());
-            } else holder.size.setText(currentJFile.getStringSize());
+            } else {
+                holder.size.setText(currentJFile.getStringSize());
+            }
             holder.info.setText(currentJFile.getStringDate());
 
 
             if (!currentJFile.isIconReady()) {
-                currentJFile.addIconReadyListener(new OnDelayLoadReady() {
-                    @Override
-                    public void onIconReady(Object object) {
-                        holder.itemView.post(() -> notifyItemChanged(position));
-                    }
-
-                    @Override
-                    public void onSizeReady(long size) {
-                    }
-                });
+                currentJFile.setIconReadyListener(object ->
+                        holder.itemView.post(() -> FileIcon.setIcon(holder, viewType, currentJFile, context)));
             }
             FileIcon.setIcon(holder, viewType, currentJFile, context);
 
@@ -168,6 +166,20 @@ public class JFileAdapter extends RecyclerView.Adapter<ViewHolder> implements Se
     public void onViewRecycled(@NonNull ViewHolder holder) {
         Glide.with(holder.image).clear(holder.image);
         super.onViewRecycled(holder);
+    }
+
+    private final AtomicBoolean sortPending = new AtomicBoolean(false);
+
+    public void onSizeBatchUpdated() {
+        if (!showFileSize) return;
+
+        if (sortPending.compareAndSet(false, true)) {
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                DialogSort.sort(jFileList);
+                notifyDataSetChanged();
+                sortPending.set(false);
+            }, 300);
+        }
     }
 
     @Override

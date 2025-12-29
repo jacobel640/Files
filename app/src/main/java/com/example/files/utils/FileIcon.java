@@ -13,7 +13,6 @@ import static com.example.files.models.JFile.Type.SHORTCUT;
 import static com.example.files.models.JFile.Type.VIDEO;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -33,30 +32,10 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.files.JFileAdapter;
 import com.example.files.R;
-import com.example.files.listeners.OnDelayLoadReady;
 import com.example.files.models.JFile;
 import com.example.files.models.ViewHolder;
 
-import java.io.File;
-
 public class FileIcon {
-
-    public static void getIcon(Activity activity, ImageView imageView, File file) {
-        JFile jFile = new JFile(file, activity);
-        Drawable placeHolder = getPlaceHolder(jFile.getType(), activity);
-        jFile.addIconReadyListener(new OnDelayLoadReady() {
-            @Override
-            public void onIconReady(Object object) {
-                setImage(imageView, placeHolder, jFile.getCachedIcon());
-            }
-
-            @Override
-            public void onSizeReady(long size) {
-
-            }
-        });
-        setImage(imageView, placeHolder, jFile.getCachedIcon());
-    }
 
     public static void setIcon(ViewHolder holder, JFileAdapter.ViewType viewType, JFile jFile, Context context) {
         setIcon(holder.iconView, holder.image, holder.icon, holder.indicator, holder.ext, viewType, jFile, context);

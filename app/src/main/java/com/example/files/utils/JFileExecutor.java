@@ -4,7 +4,7 @@ import static java.util.concurrent.Executors.*;
 
 import java.util.concurrent.ExecutorService;
 
-public class IconLoader {
+public class JFileExecutor {
     private static final ExecutorService EXECUTOR =
             newFixedThreadPool(2);
 
