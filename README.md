@@ -72,7 +72,7 @@ This app requires the following permissions to function correctly:
 ## 🏗 Installation & Build
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/JacobElcharar/Files.git
+    git clone https://github.com/jacobel640/Files.git
     ```
 2.  Open the project in **Android Studio**.
 3.  Sync Gradle and run the `:app` module.
@@ -86,7 +86,7 @@ Contributions are welcome! Feel free to open an Issue or submit a Pull Request.
 
 ## 👤 Author
 **Jacob Elcharar**
-*   GitHub: [@JacobElcharar](https://github.com/JacobElcharar)
+*   GitHub: [@jacobel640](https://github.com/jacobel640)
 
 ---
 
