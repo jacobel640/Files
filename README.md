@@ -56,7 +56,7 @@ A powerful, intuitive, and feature-rich file manager for Android. **Files** prov
     *   [Material Components](https://github.com/material-components/material-components-android) - UI/UX
     *   [Glide](https://github.com/bumptech/glide) - Image loading
     *   [OkHttp](https://github.com/square/okhttp) - Networking (Self-updates)
-    *   [Gson](https://github.com/google/gson) - JSON parsing
+    *   [Gson](https://github.com/google/gson) - JSON parsing (Self-updates)
     *   [ButterKnife](https://github.com/JakeWharton/butterknife) - View binding
 
 ---
