@@ -13,7 +13,7 @@ A powerful, intuitive, and feature-rich file manager for Android. **Files** prov
 ### 📂 Efficient File Management
 *   **Standard Operations**: Copy, move, delete, rename, and share files/folders with ease.
 *   **Storage Support**: Full access to Internal Storage and External SD Cards.
-*   **Archive Viewer**: Seamless support for viewing and extracting formats: `ZIP`, `RAR`, `7Z`, `TAR`, `GZIP`, and more.
+*   **Archive Viewer**: Seamless support for viewing and extracting `ZIP` format.
 *   **Smart Search**: Robust search engine with advanced filters (Today, This Week, This Month).
 *   **Custom Sorting**: Organize by Name, Size, Date, or Type (Ascending/Descending).
 
