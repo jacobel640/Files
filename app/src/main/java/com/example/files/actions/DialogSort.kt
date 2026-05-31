@@ -301,7 +301,7 @@ fun SortDialogContent(
                 .padding(bottom = 20.dp)
         )
 
-        SingleChoiceSegmentedButtonRow(
+        Column(
             modifier = Modifier.fillMaxWidth()
         ) {
             val sortOptions = listOf(
@@ -312,10 +312,19 @@ fun SortDialogContent(
             )
 
             sortOptions.forEachIndexed { index, (id, label) ->
-                SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = sortOptions.size),
+                val shape = when (index) {
+                    0 -> androidx.compose.foundation.shape.RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                    sortOptions.lastIndex -> androidx.compose.foundation.shape.RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                    else -> androidx.compose.foundation.shape.RoundedCornerShape(0.dp)
+                }
+                OutlinedButton(
                     onClick = { selectedSort = id },
-                    selected = selectedSort == id
+                    shape = shape,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (selectedSort == id) MaterialTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent,
+                        contentColor = if (selectedSort == id) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
+                    )
                 ) {
                     Text(text = label)
                 }

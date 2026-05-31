@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,11 +16,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.InsertDriveFile
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.ChevronLeft
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,8 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.Glide
 import com.example.files.MainActivity.instance
 import com.example.files.R
 import com.example.files.Statics
@@ -106,7 +105,7 @@ fun SearchScreenContent(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    var selectedDateLimit by remember { mutableStateOf(0L) }
+    var selectedDateLimit by remember { mutableStateOf<Int?>(null) }
     var selectedType by remember { mutableStateOf<JFile.Type?>(null) }
     var filtersExpanded by remember { mutableStateOf(false) }
 
@@ -152,7 +151,7 @@ fun SearchScreenContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(onClick = onBackClick) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                                Icon(Icons.Rounded.ChevronLeft, contentDescription = "Back")
                             }
                             TextField(
                                 value = searchQuery,
@@ -215,7 +214,7 @@ fun SearchScreenContent(
                                         modifier = Modifier.padding(end = 8.dp)
                                     )
                                     Icon(
-                                        imageVector = if (filtersExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                        imageVector = if (filtersExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
                                         contentDescription = "Expand Filters"
                                     )
                                 }
@@ -228,31 +227,35 @@ fun SearchScreenContent(
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
                                     )
+                                    val dateOptions = listOf(
+                                        Pair(stringResource(R.string.filter_today), -1),
+                                        Pair(stringResource(R.string.filter_three_days_ago), -3),
+                                        Pair(stringResource(R.string.filter_this_week), -7),
+                                        Pair(stringResource(R.string.filter_this_month), -30)
+                                    )
+                                    val typeOptions = listOf(
+                                        Pair(stringResource(R.string.pictures), JFile.Type.IMAGE),
+                                        Pair(stringResource(R.string.audio), JFile.Type.AUDIO),
+                                        Pair(stringResource(R.string.video), JFile.Type.VIDEO),
+                                        Pair(stringResource(R.string.documents), JFile.Type.DOCUMENT),
+                                        Pair(stringResource(R.string.installations), JFile.Type.APK)
+                                    )
+
                                     LazyRow(
                                         modifier = Modifier.fillMaxWidth(),
                                         contentPadding = PaddingValues(horizontal = 16.dp),
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
-                                        val calendar = Calendar.getInstance()
-                                        
-                                        val dateOptions = listOf(
-                                            Pair(stringResource(R.string.filter_today), -1),
-                                            Pair(stringResource(R.string.filter_three_days_ago), -3),
-                                            Pair(stringResource(R.string.filter_this_week), -7),
-                                            Pair(stringResource(R.string.filter_this_month), -30)
-                                        )
-
                                         items(dateOptions) { (label, daysOffset) ->
                                             FilterChip(
-                                                selected = selectedDateLimit > 0 && selectedDateLimit == getTimeOffset(daysOffset),
+                                                selected = selectedDateLimit == daysOffset,
                                                 onClick = {
-                                                    val limit = getTimeOffset(daysOffset)
-                                                    if (selectedDateLimit == limit) {
-                                                        selectedDateLimit = 0L
+                                                    if (selectedDateLimit == daysOffset) {
+                                                        selectedDateLimit = null
                                                         viewModel.clearDateFilter()
                                                     } else {
-                                                        selectedDateLimit = limit
-                                                        viewModel.setDateFilter(selectedDateLimit)
+                                                        selectedDateLimit = daysOffset
+                                                        viewModel.setDateFilter(getTimeOffset(daysOffset))
                                                     }
                                                 },
                                                 label = { Text(label) }
@@ -268,17 +271,9 @@ fun SearchScreenContent(
                                         )
                                         LazyRow(
                                             modifier = Modifier.fillMaxWidth(),
-                                            contentPadding = PaddingValues(horizontal = 16.dp, bottom = 16.dp),
+                                            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
-                                            val typeOptions = listOf(
-                                                Pair(stringResource(R.string.pictures), JFile.Type.IMAGE),
-                                                Pair(stringResource(R.string.audio), JFile.Type.AUDIO),
-                                                Pair(stringResource(R.string.video), JFile.Type.VIDEO),
-                                                Pair(stringResource(R.string.documents), JFile.Type.DOCUMENT),
-                                                Pair(stringResource(R.string.installations), JFile.Type.APK)
-                                            )
-
                                             items(typeOptions) { (label, type) ->
                                                 FilterChip(
                                                     selected = selectedType == type,
@@ -324,7 +319,7 @@ fun getTimeOffset(days: Int): Long {
     return cal.timeInMillis
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileRowItem(file: JFile) {
     val context = LocalContext.current
@@ -333,9 +328,7 @@ fun FileRowItem(file: JFile) {
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    if (Statics.multiSelected) {
-                        instance.eventListener.onItemClick(null, 0) // Mock behavior if needed, or handle directly
-                    } else if (file.isDirectory) {
+                    if (file.isDirectory) {
                         Statics.openFolder(file)
                     } else {
                         Statics.openFile(file, context)
@@ -359,20 +352,25 @@ fun FileRowItem(file: JFile) {
                 .clip(RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center
         ) {
-            if (file.type == JFile.Type.IMAGE || file.type == JFile.Type.VIDEO || file.type == JFile.Type.APK) {
-                GlideImage(
-                    model = file.path,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.InsertDriveFile,
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            androidx.compose.ui.viewinterop.AndroidView(
+                factory = { ctx ->
+                    val root = LayoutInflater.from(ctx).inflate(R.layout.icon_view, null, false)
+                    root
+                },
+                update = { root ->
+                    com.example.files.utils.FileIcon.setIcon(
+                        root,
+                        root.findViewById(R.id.icon_view_image),
+                        root.findViewById(R.id.icon_view_placeholder),
+                        root.findViewById(R.id.icon_view_indicator),
+                        root.findViewById(R.id.icon_view_ext),
+                        com.example.files.JFileAdapter.ViewType.ROW,
+                        file,
+                        root.context
+                    )
+                },
+                modifier = Modifier.fillMaxSize()
+            )
         }
         
         Spacer(modifier = Modifier.width(16.dp))

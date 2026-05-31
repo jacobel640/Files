@@ -49,6 +49,7 @@ class SearchViewModel(private val repository: FileRepository) : ViewModel() {
                     }
                 }
                 applyFilters()
+                _uiState.value = _uiState.value.copy(isLoading = false)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
             }
@@ -97,7 +98,6 @@ class SearchViewModel(private val repository: FileRepository) : ViewModel() {
         }
         
         _uiState.value = _uiState.value.copy(
-            isLoading = false,
             searchResults = filteredList
         )
     }
