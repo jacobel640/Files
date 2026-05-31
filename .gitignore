@@ -3,3 +3,10 @@
 /app/build/
 /app/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/
 /build/
+
+# IDE and local files
+/.idea/
+/local.properties
+/app/release/
+/diff.txt
+/diff_utf8.txt
