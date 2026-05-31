@@ -27,11 +27,11 @@ class FileRepository(private val context: Context) {
                         val file = File(data)
                         if (isRecent) {
                             if (filterRecent(file)) {
-                                result.add(JFile(file, context))
+                                result.add(JFile(file, context as android.app.Activity))
                                 count++
                             }
                         } else {
-                            result.add(JFile(file, context))
+                            result.add(JFile(file, context as android.app.Activity))
                         }
                     }
                 } while (it.moveToPrevious() && (!isRecent || count <= 300))
@@ -60,7 +60,7 @@ class FileRepository(private val context: Context) {
                 if (file.isDirectory) {
                     result.addAll(iterateFolder(file))
                 }
-                result.add(JFile(file, context))
+                result.add(JFile(file, context as android.app.Activity))
             }
         }
         result
