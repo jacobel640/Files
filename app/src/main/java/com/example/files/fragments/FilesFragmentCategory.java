@@ -4,7 +4,6 @@ import static com.example.files.MainActivity.enableTextButton;
 import static com.example.files.MainActivity.instance;
 import static com.example.files.MainActivity.textBtnState;
 import static com.example.files.Statics.CATEGORY_VIEW_TYPE;
-import static com.example.files.Statics.OpenSearch;
 import static com.example.files.Statics.TAG_CATEGORY;
 import static com.example.files.Statics.multiSelected;
 import static com.example.files.fragments.FragmentBase.FragmentType.CATEGORY;
@@ -26,11 +25,11 @@ import androidx.annotation.Nullable;
 
 import com.example.files.JFileAdapter;
 import com.example.files.R;
+import com.example.files.Statics;
 import com.example.files.utils.AsyncTask;
 import com.example.files.models.JFile;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class FilesFragmentCategory extends FragmentBase {
 
@@ -200,10 +199,7 @@ public class FilesFragmentCategory extends FragmentBase {
     }
 
     public boolean notVisible() {
-        if (!bool) return true;
-        return !Objects.equals(instance.getSupportFragmentManager().getFragments()
-                .get(instance.getSupportFragmentManager().getBackStackEntryCount()).getTag(), TAG_CATEGORY);
-        // TODO check if is same fragment by compering stack count with current place on stack
+        return !Statics.isVisible(TAG_CATEGORY);
     }
 
     static abstract class Work {

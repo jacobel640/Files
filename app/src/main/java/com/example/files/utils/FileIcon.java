@@ -17,7 +17,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -79,7 +78,6 @@ public class FileIcon {
 
         if (object instanceof Drawable) {
             icon.setImageDrawable((Drawable) object);
-            Log.d("setImage", "object instanceof Drawable");
             return;
         }
 
@@ -88,7 +86,7 @@ public class FileIcon {
                 .override(128, 128)
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .addListener(new RequestListener<Drawable>() {
+                .addListener(new RequestListener<>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
 
@@ -111,22 +109,15 @@ public class FileIcon {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     public static Drawable getTypeDrawable(JFile.Type type, Context context) {
-        switch (type) {
-            case FOLDER:
-                return context.getDrawable(R.drawable.folder);
-            case AUDIO:
-                return context.getDrawable(R.drawable.ctg_audio);
-            case IMAGE:
-                return context.getDrawable(R.drawable.ctg_photo);
-            case VIDEO:
-                return context.getDrawable(R.drawable.ctg_video);
-            case APK:
-                return context.getDrawable(R.drawable.ext_apk);
-            case ARCHIVE:
-                return context.getDrawable(R.drawable.ctg_archive);
-            default:
-                return context.getDrawable(R.drawable.file);
-        }
+        return switch (type) {
+            case FOLDER -> context.getDrawable(R.drawable.folder);
+            case AUDIO -> context.getDrawable(R.drawable.ctg_audio);
+            case IMAGE -> context.getDrawable(R.drawable.ctg_photo);
+            case VIDEO -> context.getDrawable(R.drawable.ctg_video);
+            case APK -> context.getDrawable(R.drawable.ext_apk);
+            case ARCHIVE -> context.getDrawable(R.drawable.ctg_archive);
+            default -> context.getDrawable(R.drawable.file);
+        };
     }
 
     public static void setImage(ImageView imageView, Drawable placeHolder, Object object) {
@@ -224,34 +215,20 @@ public class FileIcon {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     public static Drawable getPlaceHolder(JFile.Type type, Context context) {
-        Drawable drawable;
-        switch (type) {
-            case FOLDER:
-                drawable = context.getDrawable(R.drawable.folder);
-                break;
-            case AUDIO:
-                drawable = context.getDrawable(R.drawable.ctg_audio);
-                break;
-            case IMAGE:
-                drawable = context.getDrawable(R.drawable.ctg_photo);
-                break;
-            case VIDEO:
-                drawable = context.getDrawable(R.drawable.ctg_video);
-                break;
-            case APK:
-                drawable = context.getDrawable(R.drawable.ext_apk);
-                break;
-            case ARCHIVE:
-                drawable = context.getDrawable(R.drawable.ctg_archive);
-                break;
+        Drawable drawable = switch (type) {
+            case FOLDER -> context.getDrawable(R.drawable.folder);
+            case AUDIO -> context.getDrawable(R.drawable.ctg_audio);
+            case IMAGE -> context.getDrawable(R.drawable.ctg_photo);
+            case VIDEO -> context.getDrawable(R.drawable.ctg_video);
+            case APK -> context.getDrawable(R.drawable.ext_apk);
+            case ARCHIVE -> context.getDrawable(R.drawable.ctg_archive);
 //            case DOCUMENT:
 //                drawable = context.getDrawable(R.drawable.type_office); // needs change
 //                break;
-            default:
+            default ->
 //                holder.jExt.setVisibility(View.VISIBLE);
-                drawable = context.getDrawable(R.drawable.file);
-                break;
-        }
+                    context.getDrawable(R.drawable.file);
+        };
 
         return drawable;
 
@@ -293,60 +270,19 @@ public class FileIcon {
     public static JFile.Type types(String extensionTLC, boolean isDirectory) {
         if (isDirectory) return FOLDER;
         else
-            switch (extensionTLC) {
+            return switch (extensionTLC) {
                 // photo
-                case "cr2":
-                case "dng":
-                case "heic":
-                case "jpg":
-                case "jpeg":
-                case "png":
-                case "raw":
-                case "webp":
-                case "ico":
-                    return IMAGE;
+                case "cr2", "dng", "heic", "jpg", "jpeg", "png", "raw", "webp", "ico" -> IMAGE;
                 // audio
-                case "aac":
-                case "amr":
-                case "flac":
-                case "mp3":
-                case "m4a":
-                case "ogg":
-                case "opus":
-                case "wma":
-                case "wav":
-                    return AUDIO;
+                case "aac", "amr", "flac", "mp3", "m4a", "ogg", "opus", "wma", "wav" -> AUDIO;
                 // video
-                case "3gpp":
-                case "avi":
-                case "gif":
-                case "mkv":
-                case "mov":
-                case "mp4":
-                    return VIDEO;
-                case "apk":
-                    return APK;
+                case "3gpp", "avi", "gif", "mkv", "mov", "mp4" -> VIDEO;
+                case "apk" -> APK;
                 // archives
-                case "7z":
-                case "7zip":
-                case "apks":
-                case "apkm":
-                case "xapk":
-                case "gz":
-                case "jar":
-                case "rar":
-                case "zip":
-                    return ARCHIVE;
+                case "7z", "7zip", "apks", "apkm", "xapk", "gz", "jar", "rar", "zip" -> ARCHIVE;
                 // documents
-                case "txt":
-                case "pdf":
-                case "doc":
-                case "docx":
-                case "xls":
-                case "xlsx":
-                    return DOCUMENT;
-                case "lnk":
-                    return SHORTCUT;
+                case "txt", "pdf", "doc", "docx", "xls", "xlsx" -> DOCUMENT;
+                case "lnk" -> SHORTCUT;
 //                    // backup files
 //                case "bak": // restore file
 //                case "bkup":
@@ -390,8 +326,7 @@ public class FileIcon {
 //                case "vdex":
 //                case "odex":
 //                        return 0;
-                default:
-                    return OTHER;
-            }
+                default -> OTHER;
+            };
     }
 }

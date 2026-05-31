@@ -2,7 +2,7 @@
 <resources>
     <color name="app_theme">#00668B</color>
     <color name="seed">@color/app_theme</color>
-    <color name="primary">@color/app_theme</color>
+    <color name="primary">?attr/colorPrimary</color>
     <color name="on_primary">#F9FCFF</color>
     <color name="primary_container">#C1E8FF</color>
     <color name="on_primary_container">#001E2C</color>

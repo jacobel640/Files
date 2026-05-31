@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -111,11 +112,7 @@ public class FilesFragment extends FragmentBase {
             if (!showHiddenFiles && file.getName().startsWith(".")) continue;
 
             JFile jf = existing.remove(file.getPath());
-            if (jf != null) {
-                result.add(jf);
-            } else {
-                result.add(new JFile(file, requireActivity()));
-            }
+            result.add(Objects.requireNonNullElseGet(jf, () -> new JFile(file, requireActivity())));
         }
 
         return result;

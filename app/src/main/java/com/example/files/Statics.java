@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.UriPermission;
 import android.content.res.Resources;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.storage.StorageManager;
@@ -338,8 +339,8 @@ public class Statics {
         FastScrollerBuilder fastScroller = new FastScrollerBuilder(recyclerView);
         fastScroller.setPopupStyle(textView -> {
                     PopupStyles.MD2.accept(textView);
-//                textView.setBackgroundTintMode(context.getColor(R.color.primary));
-//                textView.setTextColor(context.getColor(R.color.on_primary));
+                textView.setBackgroundTintMode(PorterDuff.Mode.LIGHTEN);
+                textView.setTextColor(context.getColor(R.color.app_theme));
             })
             .setPopupTextProvider(provider)
             .setThumbDrawable(Objects.requireNonNull(context.getDrawable(R.drawable.scroll_bar_thumb)))
@@ -365,23 +366,7 @@ public class Statics {
 
     public static boolean isVisible(String tag) {
         int stackCount = instance.getSupportFragmentManager().getBackStackEntryCount();
-//        if (!showRecent && stackCount !=0) stackCount--;
-        try {
-            Log.d("##### Statics.isVisible #####", tag + " " + stackCount + "= " + instance
-                    .getSupportFragmentManager().getFragments().get(stackCount).getTag());
-        } catch (IndexOutOfBoundsException indexEx) {
-//            return tag.equals(TAG_FOLDER); // TODO this is 'haltura' fix
-            if (stackCount == 0) return false;
-            if (stackCount == 1) stackCount = 0;
-        }
-
-//        if (stackCount == 0) return false;
-//        else if (stackCount > 1) {
-//            return Objects.equals(instance.getSupportFragmentManager()
-//                    .getFragments().get(stackCount).getTag(), tag);
-//        }
-        return Objects.equals(instance.getSupportFragmentManager()
-                    .getFragments().get(stackCount).getTag(), tag);
-        // TODO check if is same fragment by compering stack count with current place on stack
+        if (stackCount <= 0) return false;
+        return Objects.equals(instance.getSupportFragmentManager().getFragments().get(stackCount-1).getTag(), tag);
     }
 }

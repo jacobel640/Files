@@ -120,23 +120,22 @@ public class SettingsActivity extends BaseActivity {
         }
 
         private void openThemePicker(Context context) {
-
             ColorPickerDialogBuilder
                     .with(context)
-                    .setTitle("בחר צבע ערכת נושא")
+                    .setTitle(context.getString(R.string.choose_theme_color))
                     .initialColor(ThemeManager.getThemeColor(context))
-                    .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                    .density(12)
-                    .setPositiveButton("החל", (dialog, selectedColor, allColors) -> {
+                    .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+                    .density(20)
+                    .setPositiveButton(context.getString(R.string.apply_theme_color), (dialog, selectedColor, allColors) -> {
                         DynamicColorUtils.applyDynamicTheme(context, selectedColor);
-                        Snackbar.make(((SettingsActivity) requireActivity()).binding.getRoot(), "הפעולה מתבצעת...", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(((SettingsActivity) requireActivity()).binding.getRoot(), R.string.aplying_dynamic_theme_message, BaseTransientBottomBar.LENGTH_SHORT).show();
                         new Handler().postDelayed(() -> restartApp(context),1000);
                     })
-                    .setNegativeButton("איפוס", (dialog, which) -> {
+                    .setNegativeButton(context.getString(R.string.reset_default_theme_color), (dialog, which) -> {
                         DynamicColorUtils.applyDynamicTheme(context, R.color.app_theme);
                         new Handler().postDelayed(() -> restartApp(context),1000);
                     })
-                    .setNegativeButton("ביטול", (dialog, which) -> dialog.dismiss())
+//                    .setNegativeButton(context.getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
                     .build()
                     .show();
         }
@@ -149,7 +148,6 @@ public class SettingsActivity extends BaseActivity {
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    assert response.body() != null;
                     String body = response.body().string();
                     printLog(body);
                     Gson gson = new GsonBuilder().create();

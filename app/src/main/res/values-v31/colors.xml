@@ -47,15 +47,15 @@
     <color name="divider">#CCCCCC</color>
     <color name="grey">#818181</color>
 
-    <color name="ctg_apk">@color/material_dynamic_primary40</color>
-    <color name="ctg_archive">@color/material_dynamic_primary40</color>
-    <color name="ctg_audio">@color/material_dynamic_primary40</color>
-    <color name="ctg_downloads">@color/material_dynamic_primary40</color>
-    <color name="ctg_photo">@color/material_dynamic_primary40</color>
-    <color name="ctg_video">@color/material_dynamic_primary40</color>
-    <color name="ext_file">@color/material_dynamic_primary40</color>
-    <color name="ext_file_corner">@color/material_dynamic_primary30</color>
-    <color name="ext_excel_badge">@color/material_dynamic_primary40</color>
+    <color name="ctg_apk">?attr/colorPrimary</color>
+    <color name="ctg_archive">?attr/colorPrimary</color>
+    <color name="ctg_audio">?attr/colorPrimary</color>
+    <color name="ctg_downloads">?attr/colorPrimary</color>
+    <color name="ctg_photo">?attr/colorPrimary</color>
+    <color name="ctg_video">?attr/colorPrimary</color>
+    <color name="ext_file">?attr/colorPrimary</color>
+    <color name="ext_file_corner">?attr/colorPrimaryDark</color>
+    <color name="ext_excel_badge">?attr/colorPrimary</color>
     <color name="ext_excel_1">@color/material_dynamic_primary80</color>
     <color name="ext_excel_2">@color/material_dynamic_primary70</color>
     <color name="ext_excel_3">@color/material_dynamic_primary60</color>

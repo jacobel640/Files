@@ -141,7 +141,7 @@ public class ZippedFragment extends FragmentBase {
                 }
             requireActivity().runOnUiThread(() -> {
                 jFileAdapter = new JFileAdapter(objects, FOLDER_VIEW_TYPE, FILES);
-                binding.emptyFolder.setVisibility(objects.size() == 0 ? View.VISIBLE : View.GONE);
+                binding.emptyFolder.setVisibility(objects.isEmpty() ? View.VISIBLE : View.GONE);
                 setListeners();
                 binding.rvFiles.setAdapter(jFileAdapter);
                 new DialogSort().sortAndNotify(jFileAdapter);
@@ -208,7 +208,7 @@ public class ZippedFragment extends FragmentBase {
         setListListener();
         new Handler().post(this::refreshActionsList);
         new Handler().postDelayed(() -> textBtnState(enableTextButton()),100);
-        if (fragmentPosition == requireActivity().getSupportFragmentManager().getBackStackEntryCount()) {
+        if (fragmentPosition == requireActivity().getSupportFragmentManager().getBackStackEntryCount()-1) {
             //new Note(requireActivity(), "hi " + currentFragment).show();
             if (bool) {
                 setListeners();

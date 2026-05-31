@@ -22,7 +22,7 @@ public class ThemeManager {
 
     public static int getThemeColor(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        int savedColor = prefs.getInt(KEY_THEME_COLOR, ContextCompat.getColor(context, R.color.primary));
+        int savedColor = prefs.getInt(KEY_THEME_COLOR, ContextCompat.getColor(context, R.color.app_theme));
         applyThemeOverlay(context, savedColor);
         return  savedColor;
     }

@@ -92,7 +92,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="10dp"
             android:progress="100"
-            app:indicatorColor="@color/app_theme"
+            app:indicatorColor="?attr/colorPrimary"
             app:trackColor="@color/divider"
             app:trackCornerRadius="8dp" />
 

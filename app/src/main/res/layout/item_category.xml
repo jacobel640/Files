@@ -39,7 +39,7 @@
             android:id="@+id/tv_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/primary_container"
+            android:background="?attr/colorSurface"
             android:gravity="center"
             android:padding="5dp"
             android:text="@string/video"

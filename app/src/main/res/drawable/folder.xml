@@ -8,7 +8,7 @@
     <path
         android:name="path"
         android:pathData="M 58.95 212.796 L 58.95 142.549 C 58.95 106.234 88.389 76.796 124.703 76.796 L 176.248 76.796 C 187.912 76.796 198.786 82.696 205.143 92.476 L 210.898 101.328 C 217.916 112.125 229.919 118.638 242.796 118.638 L 369.788 118.638 C 408.427 118.638 439.75 149.961 439.75 188.6 L 439.75 353.537 C 439.75 392.709 407.995 424.464 368.822 424.464 L 130.38 424.464 C 90.93 424.464 58.95 392.484 58.95 353.035 L 58.95 267.196 Z"
-        android:strokeColor="@color/primary"
+        android:strokeColor="?attr/colorPrimary"
         android:strokeWidth="30"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"/>

@@ -93,7 +93,7 @@
             android:maxLines="1"
             android:padding="7dp"
             android:gravity="center_horizontal"
-            android:background="@color/primary_container"
+            android:background="?attr/colorSurface"
             android:textColor="@color/text"
             />
 

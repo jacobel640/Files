@@ -8,49 +8,21 @@ import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceViewHolder;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 
-public class MaterialSwitchPreference extends SwitchPreference {
+import com.google.android.material.materialswitch.MaterialSwitch;
 
-    /**
-     * Construct a new SwitchPreference with the given style options.
-     *
-     * @param context  The Context that will style this preference
-     * @param attrs    Style attributes that differ from the default
-     * @param defStyle Theme attribute defining the default style options
-     */
-    public MaterialSwitchPreference(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
+public class MaterialSwitchPreference extends SwitchPreferenceCompat {
 
-    /**
-     * Construct a new SwitchPreference with the given style options.
-     *
-     * @param context The Context that will style this preference
-     * @param attrs   Style attributes that differ from the default
-     */
     public MaterialSwitchPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    /**
-     * Construct a new SwitchPreference with default style options.
-     *
-     * @param context The Context that will style this preference
-     */
-    public MaterialSwitchPreference(Context context) {
-        super(context, null);
-    }
-
-    public MaterialSwitchPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     private boolean value;
 
     @Override
     public void onBindViewHolder(@NonNull PreferenceViewHolder holder) {
-        CompoundButton widget = (CompoundButton) holder.findViewById(android.R.id.switch_widget);
+        MaterialSwitch widget = (MaterialSwitch) holder.findViewById(android.R.id.switch_widget);
         if (widget == null) return; // no custom widget provided
         // Clean listener before invoke SwitchPreference.onBindView
         ViewGroup viewGroup = (ViewGroup) holder.itemView;
@@ -80,12 +52,10 @@ public class MaterialSwitchPreference extends SwitchPreference {
         int count = viewGroup.getChildCount();
         for (int n = 0; n < count; ++n) {
             View childView = viewGroup.getChildAt(n);
-            if (childView instanceof CompoundButton) {
-                final CompoundButton switchView = (CompoundButton) childView;
+            if (childView instanceof MaterialSwitch switchView) {
                 switchView.setOnCheckedChangeListener(null);
                 return;
-            } else if (childView instanceof ViewGroup) {
-                ViewGroup childGroup = (ViewGroup) childView;
+            } else if (childView instanceof ViewGroup childGroup) {
                 clearListenerInViewGroup(childGroup);
             }
         }

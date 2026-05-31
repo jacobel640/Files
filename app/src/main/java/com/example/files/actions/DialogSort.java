@@ -32,7 +32,7 @@ public class DialogSort extends BottomSheetDialog {
     Activity activity;
     ArrayList<JFile> jFileList;
     JFileAdapter jFileAdapter; // Recommended to sort the array before adding it to the adapter to prevent interrupting
-    Collator collator;
+    static Collator collator = Collator.getInstance(Locale.getDefault());;
     boolean isNormalSize;
 
     int checkedOrderButton = order, checkedSortButton = sort;
@@ -40,7 +40,6 @@ public class DialogSort extends BottomSheetDialog {
     public DialogSort() {
         super(instance);
         this.activity = instance;
-        this.collator = Collator.getInstance(Locale.getDefault());
         this.isNormalSize = isNormalScreen(activity);
     }
 
@@ -49,7 +48,6 @@ public class DialogSort extends BottomSheetDialog {
         this.activity = instance;
         this.jFileAdapter = jFileAdapter;
         this.jFileList = jFileAdapter.jFileList;
-        this.collator = Collator.getInstance(Locale.getDefault());
         this.isNormalSize = isNormalScreen(activity);
         createDialogSort();
     }
@@ -162,8 +160,12 @@ public class DialogSort extends BottomSheetDialog {
 
     @SuppressLint("NotifyDataSetChanged")
     public void sort() {
-        if (jFileList != null && jFileList.size() > 0) compare(jFileList, sort, order == 1);
+        if (jFileList != null && !jFileList.isEmpty()) compare(jFileList, sort, order == 1);
         jFileAdapter.notifyDataSetChanged();
+    }
+
+    public static void sort(ArrayList<JFile> jFileList) {
+        if (jFileList != null && !jFileList.isEmpty()) compare(jFileList, sort, order == 1);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -180,37 +182,37 @@ public class DialogSort extends BottomSheetDialog {
 
     // TODO comparings
 
-    public void compare(ArrayList<JFile> jFiles, int sort, boolean reverse) {
+    public static void compare(ArrayList<JFile> jFiles, int sort, boolean reverse) {
         switch (sort) {
             case 0:
-                if (reverse) jFiles.sort(this::compareNameReverse);
-                else jFiles.sort(this::compareName);
+                if (reverse) jFiles.sort(DialogSort::compareNameReverse);
+                else jFiles.sort(DialogSort::compareName);
                 break;
             case 1:
-                if (reverse) jFiles.sort(this::compareSizeReverse);
-                else jFiles.sort(this::compareSize);
+                if (reverse) jFiles.sort(DialogSort::compareSizeReverse);
+                else jFiles.sort(DialogSort::compareSize);
                 break;
             case 2:
-                if (reverse) jFiles.sort(this::compareDateReverse);
-                else jFiles.sort(this::compareDate);
+                if (reverse) jFiles.sort(DialogSort::compareDateReverse);
+                else jFiles.sort(DialogSort::compareDate);
                 break;
             case 3:
-                if (reverse) jFiles.sort(this::compareTypeReverse);
-                else jFiles.sort(this::compareType);
+                if (reverse) jFiles.sort(DialogSort::compareTypeReverse);
+                else jFiles.sort(DialogSort::compareType);
                 break;
         }
     }
 
-    public void compareRecentFile(ArrayList<JFile> jFiles) {
-        jFiles.sort(this::compareRecentFile);
+    public static void compareRecentFile(ArrayList<JFile> jFiles) {
+        jFiles.sort(DialogSort::compareRecentFile);
     }
 
-    public int compareRecentFile(JFile file1, JFile file2) {
+    public static int compareRecentFile(JFile file1, JFile file2) {
 
         return Long.compare(file2.lastModified(), file1.lastModified());
     }
 
-    public int compareName(JFile file1, JFile file2) {
+    public static int compareName(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -221,7 +223,7 @@ public class DialogSort extends BottomSheetDialog {
         return compare(file1.getNameTLC(), file2.getNameTLC());
     }
 
-    public int compareNameReverse(JFile file1, JFile file2) {
+    public static int compareNameReverse(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -232,7 +234,7 @@ public class DialogSort extends BottomSheetDialog {
         return compare(file2.getNameTLC(), file1.getNameTLC());
     }
 
-    public int compareSize(JFile file1, JFile file2) {
+    public static int compareSize(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -245,7 +247,7 @@ public class DialogSort extends BottomSheetDialog {
         else return compare(file1.getNameTLC(), file2.getNameTLC());
     }
 
-    public int compareSizeReverse(JFile file1, JFile file2) {
+    public static int compareSizeReverse(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -258,7 +260,7 @@ public class DialogSort extends BottomSheetDialog {
         else return compare(file1.getNameTLC(), file2.getNameTLC());
     }
 
-    public int compareDate(JFile file1, JFile file2) {
+    public static int compareDate(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -269,7 +271,7 @@ public class DialogSort extends BottomSheetDialog {
         return Long.compare(file1.lastModified(), file2.lastModified());
     }
 
-    public int compareDateReverse(JFile file1, JFile file2) {
+    public static int compareDateReverse(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -280,7 +282,7 @@ public class DialogSort extends BottomSheetDialog {
         return Long.compare(file2.lastModified(), file1.lastModified());
     }
 
-    public int compareType(JFile file1, JFile file2) {
+    public static int compareType(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -293,7 +295,7 @@ public class DialogSort extends BottomSheetDialog {
         else return compare(file1.getNameTLC(), file2.getNameTLC());
     }
 
-    public int compareTypeReverse(JFile file1, JFile file2) {
+    public static int compareTypeReverse(JFile file1, JFile file2) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -306,7 +308,7 @@ public class DialogSort extends BottomSheetDialog {
         else return compare(file1.getNameTLC(), file2.getNameTLC());
     }
 
-    public int compare(JFile file1, JFile file2, int sort, boolean reverse) {
+    public static int compare(JFile file1, JFile file2, int sort, boolean reverse) {
 
         if (file1.isDirectory() && !file2.isDirectory()) {
             return -1;
@@ -350,14 +352,14 @@ public class DialogSort extends BottomSheetDialog {
     }
 
     // http://www.davekoelle.com/files/AlphanumComparator.java
-    private boolean isDigit(char ch) {
+    private static boolean isDigit(char ch) {
         return ((ch >= 48) && (ch <= 57));
     }
 
     /**
      * Length of string is passed in for improved efficiency (only need to calculate it once)
      **/
-    private String getChunk(String s, int sLength, int marker) {
+    private static String getChunk(String s, int sLength, int marker) {
         StringBuilder chunk = new StringBuilder();
         char c = s.charAt(marker);
         chunk.append(c);
@@ -382,7 +384,7 @@ public class DialogSort extends BottomSheetDialog {
         return chunk.toString();
     }
 
-    public int compare(String s1, String s2) {
+    public static int compare(String s1, String s2) {
         if ((s1 == null) || (s2 == null)) {
             return 0;
         }

@@ -58,6 +58,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -132,7 +133,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // edgeToEdge
+        EdgeToEdge.enable(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
@@ -498,14 +499,13 @@ public class MainActivity extends BaseActivity {
             @Override
             public void handleOnBackPressed() {
                 if (multiSelected) eventListener.onMultiSelectedChange(false); // when passing to ff using details path button
-                else if (getSupportFragmentManager().getBackStackEntryCount()!=0) {
+                else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                     hideKeyboard(MainActivity.this);
                     remove();
                     getOnBackPressedDispatcher().onBackPressed();
                     new Handler().postDelayed(() -> {
                         try {
-                            // TODO test if onResume required = it is.
-                            getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()).onResume();
+                            getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()-1).onResume();
                             if (isVisible(TAG_FOLDER)) currentFragment.animate();
                         } catch (IndexOutOfBoundsException ignored) {}
 

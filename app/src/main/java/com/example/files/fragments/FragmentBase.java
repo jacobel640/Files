@@ -171,7 +171,7 @@ public abstract class FragmentBase extends Fragment {
             });
         else toolbar.search.setOnClickListener(v1 -> OpenSearch(TAG_FOLDER));
         binding.rvFiles.setLayoutManager(new LinearLayoutManager(requireActivity()));
-        setFastScrollBar(binding.rvFiles, position ->
+        setFastScrollBar(binding.rvFiles, (view, position) ->
                 String.valueOf(jFileAdapter.jFileList.get(position).getName().charAt(0)));
 
         setViewType();
@@ -557,7 +557,7 @@ public abstract class FragmentBase extends Fragment {
         setListListener();
         new Handler().post(this::refreshActionsList);
         new Handler().postDelayed(() -> textBtnState(enableTextButton()),100);
-        if (fragmentPosition == requireActivity().getSupportFragmentManager().getBackStackEntryCount()) {
+        if (fragmentPosition == requireActivity().getSupportFragmentManager().getBackStackEntryCount()-1) {
             if (bool) {
                 setListeners();
                 refresh();
