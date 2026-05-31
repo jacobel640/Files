@@ -127,7 +127,7 @@ public class StorageAnalyzer extends BaseActivity {
         Cursor cursor = contentResolver.query(uri, null, null, null, sortOrder);
         if (cursor != null && cursor.moveToLast()) {
             do {
-                String data = cursor.getString(cursor.getColumnIndex(MediaStore.Downloads.DATA));
+                String data = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Downloads.DATA));
 
                 JFile jFile = new JFile(new File(String.valueOf(Uri.parse(data))), instance);
                 all.add(jFile);
