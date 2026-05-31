@@ -61,11 +61,13 @@ public class PathFormatter {
                 .append(name).append("%3A/document/").append(name).append("%3A");
 
         String[] path1 = path.split("/");
-        if (path1.length >= 3)
-        pathEnd.append(path1[3]);
-        if (path1.length >= 4)
-        for (int i = 4; i < path1.length; i++) {
-            pathEnd.append(DOC_SLASH).append(path1[i]);
+        if (path1.length >= 3) {
+            pathEnd.append(path1[3]);
+        }
+        if (path1.length >= 4) {
+            for (int i = 4; i < path1.length; i++) {
+                pathEnd.append(DOC_SLASH).append(path1[i]);
+            }
         }
 
         return pathEnd.toString().replace(" ", "%20");
