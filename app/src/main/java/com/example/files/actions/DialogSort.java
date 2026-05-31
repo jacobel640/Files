@@ -92,26 +92,21 @@ public class DialogSort extends BottomSheetDialog {
 
         groupSort.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
-                switch (checkedId) {
-                    case R.id.sort_by_name:
-                        checkedSortButton = 0;
-                        Log.d("##### checkedId #####", "sort_by_name");
-                        break;
-                    case R.id.sort_by_size:
-                        checkedSortButton = 1;
-                        Log.d("##### checkedId #####", "sort_by_size");
-                        break;
-                    case R.id.sort_by_date:
-                        checkedSortButton = 2;
-                        Log.d("##### checkedId #####", "sort_by_date");
-                        break;
-                    case R.id.sort_by_type:
-                        checkedSortButton = 3;
-                        Log.d("##### checkedId #####", "sort_by_type");
-                        break;
-                    default:
-                        checkedSortButton = 0;
-                        Log.d("##### checkedId #####", "default");
+                if (checkedId == R.id.sort_by_name) {
+                    checkedSortButton = 0;
+                    Log.d("##### checkedId #####", "sort_by_name");
+                } else if (checkedId == R.id.sort_by_size) {
+                    checkedSortButton = 1;
+                    Log.d("##### checkedId #####", "sort_by_size");
+                } else if (checkedId == R.id.sort_by_date) {
+                    checkedSortButton = 2;
+                    Log.d("##### checkedId #####", "sort_by_date");
+                } else if (checkedId == R.id.sort_by_type) {
+                    checkedSortButton = 3;
+                    Log.d("##### checkedId #####", "sort_by_type");
+                } else {
+                    checkedSortButton = 0;
+                    Log.d("##### checkedId #####", "default");
                 }
             }
         });

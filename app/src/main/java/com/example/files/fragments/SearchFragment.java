@@ -56,6 +56,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
+import androidx.lifecycle.ViewModelProvider;
+import com.example.files.viewmodels.SearchViewModel;
+
 public class SearchFragment extends Fragment {
 
     boolean cancel;
@@ -94,9 +97,12 @@ public class SearchFragment extends Fragment {
         Log.d("##### newSFragment #####", "withJFiles");
     }
 
+    private SearchViewModel searchViewModel;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
         if (multiSelected) instance.eventListener.onMultiSelectedChange(false);
         if (multiSelected) multiSelected = false;
