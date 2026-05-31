@@ -188,7 +188,7 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        setFastScrollBar(rvFiles, position ->
+        setFastScrollBar(rvFiles, (view, position) ->
                 String.valueOf(jFileAdapter.jFileList.get(position).getName().charAt(0)));
 
         showKeyboard(requireActivity());
@@ -334,17 +334,8 @@ public class SearchFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            if (category.equals("folder")) progress.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(Void... arg0) {
-
-            if (category.equals("search")) {
-                setAdapter(0);
-                setAdapter(1);
-                if (cancel) cancel(true);
-            } else if (category.equals("folder")) {
+            if (category.equals("folder")) {
+                progress.setVisibility(View.VISIBLE);
                 folderChip = new JChip(requireContext(), folder.getName());
                 folderChip.setOnCheckedChangeListener((compoundButton, checked) -> {
                     hideKeyboard(instance);
@@ -356,7 +347,17 @@ public class SearchFragment extends Fragment {
                         recreateList(jFiles);
                     }
                 });
+            }
+        }
 
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            if (category.equals("search")) {
+                setAdapter(0);
+                setAdapter(1);
+                if (cancel) cancel(true);
+            } else if (category.equals("folder")) {
                 jFiles = new ArrayList<>();
                 iterateFolder(folder);
                 if (cancel) cancel(true);
@@ -364,11 +365,6 @@ public class SearchFragment extends Fragment {
 
             if (!category.equals("search") && !category.equals("folder")) {
                 objects = new ArrayList<>(jFiles);
-
-                if (!category.equals("downloads") && !category.equals("recent")) {
-                    filterTypeChips.setVisibility(GONE);
-                    filterTypeTitle.setVisibility(GONE);
-                }
             }
 
             return null;
@@ -395,6 +391,13 @@ public class SearchFragment extends Fragment {
             if (folderChip != null) {
                 folderChip.setChecked(true);
                 ((LinearLayout) requireView().findViewById(R.id.folder_chip)).addView(folderChip);
+            }
+
+            if (!category.equals("search") && !category.equals("folder")) {
+                if (!category.equals("downloads") && !category.equals("recent")) {
+                    filterTypeChips.setVisibility(GONE);
+                    filterTypeTitle.setVisibility(GONE);
+                }
             }
         }
 
