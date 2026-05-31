@@ -75,6 +75,11 @@ class SearchViewModel(private val repository: FileRepository) : ViewModel() {
         applyFilters()
     }
 
+    fun clearTypeFilter() {
+        typeFilter = null
+        applyFilters()
+    }
+
     private fun applyFilters() {
         var filteredList = allFiles
         

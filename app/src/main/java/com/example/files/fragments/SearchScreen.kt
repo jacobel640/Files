@@ -33,10 +33,19 @@ import com.example.files.models.JFile
 import com.example.files.viewmodels.SearchViewModel
 import java.util.Calendar
 
-class SearchScreen(
-    val category: String = "",
-    val jFiles: ArrayList<JFile>? = null
-) : Fragment() {
+class SearchScreen() : Fragment() {
+
+    var category: String = ""
+    var jFiles: ArrayList<JFile>? = null
+
+    constructor(category: String) : this() {
+        this.category = category
+    }
+
+    constructor(category: String, jFiles: ArrayList<JFile>?) : this() {
+        this.category = category
+        this.jFiles = jFiles
+    }
 
     private lateinit var searchViewModel: SearchViewModel
 
@@ -155,7 +164,7 @@ fun SearchScreenContent(
                         onClick = {
                             if (selectedType == JFile.Type.IMAGE) {
                                 selectedType = null
-                                viewModel.setTypeFilter(null)
+                                viewModel.clearTypeFilter()
                             } else {
                                 selectedType = JFile.Type.IMAGE
                                 viewModel.setTypeFilter(JFile.Type.IMAGE)
@@ -170,7 +179,7 @@ fun SearchScreenContent(
                         onClick = {
                             if (selectedType == JFile.Type.AUDIO) {
                                 selectedType = null
-                                viewModel.setTypeFilter(null)
+                                viewModel.clearTypeFilter()
                             } else {
                                 selectedType = JFile.Type.AUDIO
                                 viewModel.setTypeFilter(JFile.Type.AUDIO)
@@ -185,7 +194,7 @@ fun SearchScreenContent(
                         onClick = {
                             if (selectedType == JFile.Type.VIDEO) {
                                 selectedType = null
-                                viewModel.setTypeFilter(null)
+                                viewModel.clearTypeFilter()
                             } else {
                                 selectedType = JFile.Type.VIDEO
                                 viewModel.setTypeFilter(JFile.Type.VIDEO)
@@ -206,7 +215,7 @@ fun SearchScreenContent(
             }
         } else if (uiState.searchResults.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No results found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.no_results), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             Text(
