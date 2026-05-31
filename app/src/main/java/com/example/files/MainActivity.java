@@ -93,7 +93,7 @@ import com.example.files.fragments.FilesFragment;
 import com.example.files.fragments.FilesFragmentCategory;
 import com.example.files.fragments.FragmentBase;
 import com.example.files.fragments.RecentFragment;
-import com.example.files.fragments.SearchFragment;
+import com.example.files.fragments.SearchScreen;
 import com.example.files.fragments.ZippedFragment;
 import com.example.files.listeners.OnMultiSelectedChange;
 import com.example.files.models.JFile;
@@ -340,8 +340,8 @@ public class MainActivity extends BaseActivity {
     }
 
     public Fragment newSFragment(String category, ArrayList<JFile> jFiles) {
-        if (jFiles != null) return searchFragment = new SearchFragment(category, jFiles);
-        return searchFragment = new SearchFragment(category);
+        if (jFiles != null) return searchFragment = new SearchScreen(category, jFiles);
+        return searchFragment = new SearchScreen(category);
     }
 
     public Fragment newDFragment(String category) {
@@ -586,7 +586,7 @@ public class MainActivity extends BaseActivity {
     private void statics() {
         shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
         currentFragment = new FilesFragment();
-        searchFragment = new SearchFragment();
+        searchFragment = new SearchScreen();
         actions = new ArrayList<>();
     }
 

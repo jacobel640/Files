@@ -34,7 +34,7 @@ import com.example.files.database.DBHelper;
 import com.example.files.view.Note;
 import com.example.files.actions.DialogBase;
 import com.example.files.fragments.FragmentBase;
-import com.example.files.fragments.SearchFragment;
+import com.example.files.fragments.SearchScreen;
 import com.example.files.models.JFile;
 import com.example.files.models.StorageItem;
 import com.google.android.material.snackbar.Snackbar;
@@ -77,7 +77,7 @@ public class Statics {
     @SuppressLint("StaticFieldLeak")
     public static FragmentBase currentFragment;
     @SuppressLint("StaticFieldLeak")
-    public static SearchFragment searchFragment;
+    public static SearchScreen searchFragment;
     // operations
     @SuppressLint("StaticFieldLeak")
     public static ArrayList<DialogBase> actions;
