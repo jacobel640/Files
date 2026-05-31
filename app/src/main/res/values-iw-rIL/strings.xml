@@ -149,7 +149,7 @@
     <string name="this_directory_already_exists">הנתיב הזה כבר קיים</string>
     <string name="do_you_want_to_merge_the_files_to_the_same_folder">אתה רוצה למזג את הקבצים לאותה תיקייה?</string>
     <string name="insufficient_space_title">אין מספיק מקום!</string>
-    <string name="insufficient_space_alert">קבצים להעתקה: %s\nמקום פנוי: %s\nתצטרך עוד %s נוספים כדי לבצע את הפעולה הזאת!</string>
+    <string name="insufficient_space_alert">קבצים להעתקה: %1$s\nמקום פנוי: %2$s\nתצטרך עוד %3$s נוספים כדי לבצע את הפעולה הזאת!</string>
     <string name="insufficient_space_hint">(מחשב 100 מ\"ב פחות כדי להשאיר מקום פנוי במכשיר)</string>
     <string name="title_storage">אחסון</string>
     <string name="error_existed_name_conflict">כבר קיים קובץ עם שם זהה!</string>
@@ -161,4 +161,8 @@
     <string name="title_self_update">עדכון עצמי</string>
     <string name="title_changelog">רשימת שינויים</string>
     <string name="download_update">הורד עדכון</string>
+    <string name="aplying_dynamic_theme_message">הפעולה מתבצעת...</string>
+    <string name="choose_theme_color">בחר צבע ערכת נושא</string>
+    <string name="apply_theme_color">החל</string>
+    <string name="reset_default_theme_color">איפוס</string>
 </resources>

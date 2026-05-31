@@ -151,7 +151,7 @@
     <string name="this_directory_already_exists">This directory already exists</string>
     <string name="do_you_want_to_merge_the_files_to_the_same_folder">Do you want to merge the files to the same folder?</string>
     <string name="insufficient_space_title">Insufficient space!</string>
-    <string name="insufficient_space_alert">Files to copy: %s\nFree Space: %s\nYou need more %s to proceed!</string>
+    <string name="insufficient_space_alert">Files to copy: %1$s\nFree Space: %2$s\nYou need more %3$s to proceed!</string>
     <string name="insufficient_space_hint">(leaving extra 100 MB space on the storage empty)</string>
     <string name="title_storage">Storage</string>
     <string name="error_existed_name_conflict">Another file with the same name already exist!</string>
@@ -162,4 +162,8 @@
     <string name="title_self_update">Self Update</string>
     <string name="title_changelog">Changelog</string>
     <string name="download_update">Download Update</string>
+    <string name="aplying_dynamic_theme_message">הפעולה מתבצעת...</string>
+    <string name="choose_theme_color">בחר צבע ערכת נושא</string>
+    <string name="apply_theme_color">החל</string>
+    <string name="reset_default_theme_color">איפוס</string>
 </resources>
