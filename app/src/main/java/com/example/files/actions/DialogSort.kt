@@ -301,11 +301,8 @@ fun SortDialogContent(
                 .padding(bottom = 20.dp)
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, fill = false)
-                .verticalScroll(rememberScrollState())
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth()
         ) {
             val sortOptions = listOf(
                 0 to stringResource(R.string.name),
@@ -314,16 +311,13 @@ fun SortDialogContent(
                 3 to stringResource(R.string.sort_type)
             )
 
-            sortOptions.forEach { (index, label) ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            sortOptions.forEachIndexed { index, (id, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = sortOptions.size),
+                    onClick = { selectedSort = id },
+                    selected = selectedSort == id
                 ) {
-                    RadioButton(
-                        selected = selectedSort == index,
-                        onClick = { selectedSort = index }
-                    )
-                    Text(text = label, modifier = Modifier.padding(start = 8.dp))
+                    Text(text = label)
                 }
             }
         }
@@ -339,24 +333,19 @@ fun SortDialogContent(
                 .padding(start = 8.dp, top = 10.dp, bottom = 5.dp)
         )
 
-        val orderOptions = listOf(
-            0 to stringResource(R.string.ascending_order),
-            1 to stringResource(R.string.descending_order)
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
         ) {
-            orderOptions.forEach { (index, label) ->
-                OutlinedButton(
-                    onClick = { selectedOrder = index },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = if (selectedOrder == index) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
-                    )
+            val orderOptions = listOf(
+                0 to stringResource(R.string.ascending_order),
+                1 to stringResource(R.string.descending_order)
+            )
+
+            orderOptions.forEachIndexed { index, (id, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = orderOptions.size),
+                    onClick = { selectedOrder = id },
+                    selected = selectedOrder == id
                 ) {
                     Text(text = label)
                 }
