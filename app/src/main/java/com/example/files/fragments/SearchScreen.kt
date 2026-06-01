@@ -323,62 +323,69 @@ fun getTimeOffset(days: Int): Long {
 @Composable
 fun FileRowItem(file: JFile) {
     val context = LocalContext.current
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {
-                    if (file.isDirectory) {
-                        Statics.openFolder(file)
-                    } else {
-                        Statics.openFile(file, context)
-                    }
-                },
-                onLongClick = {
-                    if (!Statics.multiSelected) {
-                        if (file.parentFile != null) {
-                            Statics.openFolder(file.parentFile!!)
-                            Statics.currentFragment?.select(file.path)
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {
+                        if (file.isDirectory) {
+                            Statics.openFolder(file)
+                        } else {
+                            Statics.openFile(file, context)
+                        }
+                    },
+                    onLongClick = {
+                        if (!Statics.multiSelected) {
+                            if (file.parentFile != null) {
+                                Statics.openFolder(file.parentFile!!)
+                                Statics.currentFragment?.select(file.path)
+                            }
                         }
                     }
+                )
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            com.example.files.utils.FileIcon(
+                file = file,
+                modifier = Modifier.size(50.dp)
+            )
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = file.name,
+                    fontSize = 17.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = file.stringDate,
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(3f)
+                    )
+                    Text(
+                        text = Formatter.formatShortFileSize(context, file.size),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(2f),
+                        textAlign = TextAlign.End
+                    )
                 }
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        com.example.files.utils.FileIcon(
-            file = file,
-            modifier = Modifier.size(50.dp)
-        )
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = file.name,
-                fontSize = 17.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = file.stringDate,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(3f)
-                )
-                Text(
-                    text = Formatter.formatShortFileSize(context, file.size),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(2f),
-                    textAlign = TextAlign.End
-                )
             }
         }
+        androidx.compose.material3.HorizontalDivider(
+            modifier = Modifier.padding(start = 82.dp),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+        )
     }
 }
