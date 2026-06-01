@@ -69,17 +69,31 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
             GlideImage(
                 model = iconModel,
                 contentDescription = null,
-                modifier = Modifier.matchParentSize(),
+                modifier = Modifier.matchParentSize().padding(if (isImageType) 0.dp else 5.dp),
                 contentScale = if (isImageType) ContentScale.Crop else ContentScale.Fit,
-                loading = placeholder(typePainter),
-                failure = placeholder(typePainter)
+                loading = placeholder {
+                    Image(
+                        painter = typePainter,
+                        contentDescription = null,
+                        modifier = Modifier.matchParentSize().padding(5.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                },
+                failure = placeholder {
+                    Image(
+                        painter = typePainter,
+                        contentDescription = null,
+                        modifier = Modifier.matchParentSize().padding(5.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                }
             )
         } else {
             // Fallback placeholder while loading or if it is just a drawable
             Image(
                 painter = typePainter,
                 contentDescription = null,
-                modifier = Modifier.matchParentSize().padding(if (isImageType) 0.dp else 4.dp),
+                modifier = Modifier.matchParentSize().padding(5.dp),
                 contentScale = ContentScale.Fit
             )
         }
