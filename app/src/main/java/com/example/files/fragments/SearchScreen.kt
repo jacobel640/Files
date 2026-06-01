@@ -346,32 +346,10 @@ fun FileRowItem(file: JFile) {
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            androidx.compose.ui.viewinterop.AndroidView(
-                factory = { ctx ->
-                    val root = LayoutInflater.from(ctx).inflate(R.layout.icon_view, null, false)
-                    root
-                },
-                update = { root ->
-                    com.example.files.utils.FileIcon.setIcon(
-                        root,
-                        root.findViewById(R.id.icon_view_image),
-                        root.findViewById(R.id.icon_view_placeholder),
-                        root.findViewById(R.id.icon_view_indicator),
-                        root.findViewById(R.id.icon_view_ext),
-                        com.example.files.JFileAdapter.ViewType.ROW,
-                        file,
-                        root.context
-                    )
-                },
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        com.example.files.utils.FileIcon(
+            file = file,
+            modifier = Modifier.size(50.dp)
+        )
         
         Spacer(modifier = Modifier.width(16.dp))
         
