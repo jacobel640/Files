@@ -52,6 +52,7 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
             else -> R.drawable.file
         }
     }
+    val typePainter = painterResource(id = typeResourceId)
     val isImageType = remember(file.type) { FileIcon.isImageType(file.type) }
     
     // Check if the loaded model is essentially "just a placeholder" and not real media.
@@ -71,16 +72,16 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                 modifier = Modifier.matchParentSize().padding(if (isImageType) 0.dp else 5.dp),
                 contentScale = if (isImageType) ContentScale.Crop else ContentScale.Fit,
                 loading = placeholder {
-                    GlideImage(
-                        model = typeResourceId,
+                    Image(
+                        painter = typePainter,
                         contentDescription = null,
                         modifier = Modifier.matchParentSize().padding(5.dp),
                         contentScale = ContentScale.Fit
                     )
                 },
                 failure = placeholder {
-                    GlideImage(
-                        model = typeResourceId,
+                    Image(
+                        painter = typePainter,
                         contentDescription = null,
                         modifier = Modifier.matchParentSize().padding(5.dp),
                         contentScale = ContentScale.Fit
@@ -89,8 +90,8 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
             )
         } else {
             // Fallback placeholder while loading or if it is just a drawable
-            GlideImage(
-                model = typeResourceId,
+            Image(
+                painter = typePainter,
                 contentDescription = null,
                 modifier = Modifier.matchParentSize().padding(5.dp),
                 contentScale = ContentScale.Fit
@@ -113,8 +114,8 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                     .padding(4.dp),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                GlideImage(
-                    model = typeResourceId,
+                Image(
+                    painter = typePainter,
                     contentDescription = "Type Indicator",
                     modifier = Modifier.size(12.dp)
                 )
