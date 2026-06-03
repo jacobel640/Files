@@ -94,6 +94,8 @@ fun FilesScreen(
         }
     }
 
+    var currentSort by remember { mutableIntStateOf(Statics.sort) }
+    
     if (showSortDialog) {
         ModalBottomSheet(onDismissRequest = { showSortDialog = false }) {
             SortDialogContent(
@@ -102,6 +104,7 @@ fun FilesScreen(
                 onApply = { selectedSort, selectedOrder ->
                     Statics.sort = selectedSort
                     Statics.order = selectedOrder
+                    currentSort = selectedSort
                     MainActivity.editor.putInt("SORT", selectedSort).apply()
                     MainActivity.editor.putInt("ORDER", selectedOrder).apply()
                     showSortDialog = false
@@ -115,179 +118,146 @@ fun FilesScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            var titleHeightPx by remember { mutableFloatStateOf(0f) }
-            LaunchedEffect(titleHeightPx) {
-                if (titleHeightPx > 0f) {
-                    scrollBehavior.state.heightOffsetLimit = -titleHeightPx
-                }
-            }
-            
-            val offset = scrollBehavior.state.heightOffset
-            
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    val newHeight = (placeable.height + offset).roundToInt().coerceAtLeast(0)
-                    layout(placeable.width, newHeight) {
-                        placeable.place(0, offset.roundToInt())
-                    }
-                }
-                .clipToBounds()
-            ) {
-                // Title Row
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .onGloballyPositioned { titleHeightPx = it.size.height.toFloat() }
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = if (uiState.selectedFiles.isNotEmpty()) {
-                            stringResource(R.string.items_chosen, uiState.selectedFiles.size.toString())
-                        } else if (uiState.currentPath == android.os.Environment.getExternalStorageDirectory().path) {
-                            stringResource(R.string.internal_storage)
-                        } else {
-                            java.io.File(uiState.currentPath).name
-                        },
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp,
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                
-                // Toolbar Row
-                Row(
-                    modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = {
-                        if (uiState.selectedFiles.isNotEmpty()) {
-                            viewModel.clearSelection()
-                        } else {
-                            onNavigateBack()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBackIos,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.weight(1f))
-                    
-                    if (uiState.selectedFiles.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.toggleFavorite(context) }) {
-                            Icon(
-                                painter = painterResource(id = if (uiState.isAllSelectedFavorites) R.drawable.star else R.drawable.star_outline),
-                                contentDescription = "Favorite",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
+            Column {
+                LargeTopAppBar(
+                    title = {
                         Text(
-                            text = "${uiState.selectedFiles.size} selected",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.align(Alignment.CenterVertically)
+                            text = if (uiState.selectedFiles.isNotEmpty()) {
+                                stringResource(R.string.items_chosen, uiState.selectedFiles.size.toString())
+                            } else if (uiState.currentPath == android.os.Environment.getExternalStorageDirectory().path) {
+                                stringResource(R.string.internal_storage)
+                            } else {
+                                java.io.File(uiState.currentPath).name
+                            },
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                        IconButton(onClick = { viewModel.selectAll() }) {
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            if (uiState.selectedFiles.isNotEmpty()) {
+                                viewModel.clearSelection()
+                            } else {
+                                onNavigateBack()
+                            }
+                        }) {
                             Icon(
-                                imageVector = if (uiState.selectedFiles.size == uiState.files.size && uiState.files.isNotEmpty()) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
-                                contentDescription = "Select All",
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBackIos,
+                                contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
-                    } else {
-                        IconButton(onClick = { viewModel.toggleViewType() }) {
-                            Icon(
-                                imageVector = if (uiState.isGridView) Icons.AutoMirrored.Rounded.List else Icons.Rounded.GridView,
-                                contentDescription = "Toggle View",
-                                tint = MaterialTheme.colorScheme.onSurface
+                    },
+                    actions = {
+                        if (uiState.selectedFiles.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.toggleFavorite(context) }) {
+                                Icon(
+                                    painter = painterResource(id = if (uiState.isAllSelectedFavorites) R.drawable.star else R.drawable.star_outline),
+                                    contentDescription = "Favorite",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            Text(
+                                text = "${uiState.selectedFiles.size} selected",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.align(Alignment.CenterVertically)
                             )
+                            IconButton(onClick = { viewModel.selectAll() }) {
+                                Icon(
+                                    imageVector = if (uiState.selectedFiles.size == uiState.files.size && uiState.files.isNotEmpty()) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
+                                    contentDescription = "Select All",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        } else {
+                            IconButton(onClick = { viewModel.toggleViewType() }) {
+                                Icon(
+                                    imageVector = if (uiState.isGridView) Icons.AutoMirrored.Rounded.List else Icons.Rounded.GridView,
+                                    contentDescription = "Toggle View",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            IconButton(onClick = { Statics.OpenSearch(Statics.TAG_FOLDER) }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Search,
+                                    contentDescription = "Search",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
                         }
-                        IconButton(onClick = { Statics.OpenSearch(Statics.TAG_FOLDER) }) {
-                            Icon(
-                                imageVector = Icons.Rounded.Search,
-                                contentDescription = "Search",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                    
-                    Box {
-                        IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Rounded.MoreVert, contentDescription = "More options", tint = MaterialTheme.colorScheme.onSurface)
-                        }
-                        DropdownMenu(
-                            expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false }
-                        ) {
-                            val selectedSize = uiState.selectedFiles.size
-                            if (selectedSize == 0) {
-                                DropdownMenuItem(text = { Text(stringResource(R.string.create_new)) }, onClick = { 
-                                    menuExpanded = false
-                                    DialogCreateNew(context, false) 
-                                })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.sort_by)) }, onClick = { 
-                                    menuExpanded = false
-                                    showSortDialog = true
-                                })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.settings)) }, onClick = { 
-                                    menuExpanded = false
-                                    context.startActivity(Intent(context, SettingsActivity::class.java))
-                                })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.refresh)) }, onClick = { 
-                                    menuExpanded = false
-                                    viewModel.refreshList(context)
-                                })
-                            } else if (selectedSize == 1) {
-                                DropdownMenuItem(text = { Text(stringResource(R.string.rename)) }, onClick = { 
-                                    menuExpanded = false
-                                    DialogRename(context)
-                                })
-                                if (!uiState.selectedFiles[0].isDirectory) {
-                                    DropdownMenuItem(text = { Text(stringResource(R.string.open_with)) }, onClick = { 
+                        
+                        Box {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(Icons.Rounded.MoreVert, contentDescription = "More options", tint = MaterialTheme.colorScheme.onSurface)
+                            }
+                            DropdownMenu(
+                                expanded = menuExpanded,
+                                onDismissRequest = { menuExpanded = false }
+                            ) {
+                                val selectedSize = uiState.selectedFiles.size
+                                if (selectedSize == 0) {
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.create_new)) }, onClick = { 
                                         menuExpanded = false
-                                        Statics.openFileWith(uiState.selectedFiles[0], context)
+                                        DialogCreateNew(context, false) 
+                                    })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by)) }, onClick = { 
+                                        menuExpanded = false
+                                        showSortDialog = true
+                                    })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.settings)) }, onClick = { 
+                                        menuExpanded = false
+                                        context.startActivity(Intent(context, SettingsActivity::class.java))
+                                    })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.refresh)) }, onClick = { 
+                                        menuExpanded = false
+                                        viewModel.refreshList(context)
+                                    })
+                                } else if (selectedSize == 1) {
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.rename)) }, onClick = { 
+                                        menuExpanded = false
+                                        DialogRename(context)
+                                    })
+                                    if (!uiState.selectedFiles[0].isDirectory) {
+                                        DropdownMenuItem(text = { Text(stringResource(R.string.open_with)) }, onClick = { 
+                                            menuExpanded = false
+                                            Statics.openFileWith(uiState.selectedFiles[0], context)
+                                        })
+                                    }
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.details)) }, onClick = { 
+                                        menuExpanded = false
+                                        DialogDetails(context, false)
                                     })
                                 }
-                                DropdownMenuItem(text = { Text(stringResource(R.string.details)) }, onClick = { 
-                                    menuExpanded = false
-                                    DialogDetails(context, false)
-                                })
-                            }
-                            
-                            if (selectedSize > 0) {
-                                DropdownMenuItem(text = { Text(stringResource(R.string.move)) }, onClick = { 
-                                    menuExpanded = false
-                                    Statics.prepareAction(DialogMove(ArrayList(uiState.selectedFiles)))
-                                    viewModel.clearSelection()
-                                })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.copy_action)) }, onClick = { 
-                                    menuExpanded = false
-                                    Statics.prepareAction(DialogCopy(ArrayList(uiState.selectedFiles)))
-                                    viewModel.clearSelection()
-                                })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.delete)) }, onClick = { 
-                                    menuExpanded = false
-                                    Statics.prepareAction(DialogDelete(ArrayList(uiState.selectedFiles)))
-                                    viewModel.clearSelection()
-                                })
-                                DropdownMenuItem(text = { Text(stringResource(R.string.add_to_favorites)) }, onClick = { 
-                                    menuExpanded = false
-                                    uiState.selectedFiles.forEach { Statics.favorites.addToFavorites(it) }
-                                    viewModel.clearSelection()
-                                })
+                                
+                                if (selectedSize > 0) {
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.move)) }, onClick = { 
+                                        menuExpanded = false
+                                        Statics.prepareAction(DialogMove(ArrayList(uiState.selectedFiles)))
+                                        viewModel.clearSelection()
+                                    })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.copy_action)) }, onClick = { 
+                                        menuExpanded = false
+                                        Statics.prepareAction(DialogCopy(ArrayList(uiState.selectedFiles)))
+                                        viewModel.clearSelection()
+                                    })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.delete)) }, onClick = { 
+                                        menuExpanded = false
+                                        Statics.prepareAction(DialogDelete(ArrayList(uiState.selectedFiles)))
+                                        viewModel.clearSelection()
+                                    })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.add_to_favorites)) }, onClick = { 
+                                        menuExpanded = false
+                                        uiState.selectedFiles.forEach { Statics.favorites.addToFavorites(it) }
+                                        viewModel.clearSelection()
+                                    })
+                                }
                             }
                         }
-                    }
-                }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
                 
                 if (uiState.selectedFiles.isEmpty()) {
                     com.example.files.components.PathBreadcrumbs(
@@ -435,7 +405,8 @@ fun FilesScreen(
                 com.example.files.components.FastScroller(
                     gridState = gridState,
                     items = uiState.files,
-                    modifier = Modifier.align(Alignment.TopEnd)
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    sortMode = currentSort
                 )
             }
         }

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.files.Statics
 import com.example.files.models.JFile
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -31,7 +32,8 @@ import kotlin.math.roundToInt
 fun FastScroller(
     gridState: LazyGridState,
     items: List<JFile>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sortMode: Int = Statics.sort
 ) {
     if (items.isEmpty()) return
 
@@ -44,12 +46,12 @@ fun FastScroller(
     val totalItemsCount = gridState.layoutInfo.totalItemsCount
     if (totalItemsCount == 0) return
     
-    val popupText by remember(items) {
+    val popupText by remember(items, sortMode) {
         derivedStateOf {
             val firstVisibleItemIndex = gridState.firstVisibleItemIndex
             if (firstVisibleItemIndex in items.indices) {
                 val file = items[firstVisibleItemIndex]
-                when (Statics.sort) {
+                when (sortMode) {
                     0 -> file.name.take(1).uppercase()
                     1 -> Formatter.formatFileSize(context, file.size)
                     2 -> {
@@ -72,7 +74,18 @@ fun FastScroller(
         gridState.firstVisibleItemIndex.toFloat() / (totalItemsCount - 1)
     } else 0f
     
-    val thumbAlpha by animateFloatAsState(targetValue = if (isDragging || gridState.isScrollInProgress) 1f else 0f, label = "thumbAlpha")
+    var isVisible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(isDragging, gridState.isScrollInProgress) {
+        if (isDragging || gridState.isScrollInProgress) {
+            isVisible = true
+        } else {
+            delay(1500)
+            isVisible = false
+        }
+    }
+    
+    val thumbAlpha by animateFloatAsState(targetValue = if (isVisible) 1f else 0f, label = "thumbAlpha")
     val popupAlpha by animateFloatAsState(targetValue = if (isDragging) 1f else 0f, label = "popupAlpha")
 
     var dragY by remember { mutableFloatStateOf(0f) }
@@ -84,6 +97,31 @@ fun FastScroller(
             .onGloballyPositioned { coordinates ->
                 containerHeight = coordinates.size.height.toFloat()
             }
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = { 
+                        isDragging = true
+                        // Calculate an initial dragY based on current scroll position
+                        val thumbHeightPx = thumbHeight.toPx()
+                        val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
+                        dragY = (maxOffset * proportion).coerceIn(0f, maxOffset)
+                    },
+                    onDragEnd = { isDragging = false },
+                    onDragCancel = { isDragging = false },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        val thumbHeightPx = thumbHeight.toPx()
+                        val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
+                        dragY += dragAmount.y
+                        val clampedY = dragY.coerceIn(0f, maxOffset)
+                        val targetProportion = if (maxOffset > 0) clampedY / maxOffset else 0f
+                        val targetIndex = (targetProportion * totalItemsCount).toInt().coerceIn(0, totalItemsCount - 1)
+                        coroutineScope.launch {
+                            gridState.scrollToItem(targetIndex)
+                        }
+                    }
+                )
+            }
     ) {
         val thumbHeightPx = with(context.resources.displayMetrics) { thumbHeight.value * density }
         val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
@@ -93,27 +131,7 @@ fun FastScroller(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset { IntOffset(0, yOffset.roundToInt()) }
-                    .pointerInput(Unit) {
-                        detectDragGestures(
-                            onDragStart = { 
-                                isDragging = true
-                                dragY = yOffset
-                            },
-                            onDragEnd = { isDragging = false },
-                            onDragCancel = { isDragging = false },
-                            onDrag = { change, dragAmount ->
-                                change.consume()
-                                dragY += dragAmount.y
-                                val clampedY = dragY.coerceIn(0f, maxOffset)
-                                val targetProportion = if (maxOffset > 0) clampedY / maxOffset else 0f
-                                val targetIndex = (targetProportion * totalItemsCount).toInt().coerceIn(0, totalItemsCount - 1)
-                                coroutineScope.launch {
-                                    gridState.scrollToItem(targetIndex)
-                                }
-                            }
-                        )
-                    },
+                    .offset { IntOffset(0, yOffset.roundToInt()) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
