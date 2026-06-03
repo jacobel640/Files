@@ -1,33 +1,42 @@
-package com.example.files.utils
+package com.example.files.components
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.files.R
 import com.example.files.models.JFile
+import com.example.files.utils.FileIcon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
     var iconModel by remember(file) { mutableStateOf<Any?>(file.cachedIcon) }
     
     // Load the precise icon/art model asynchronously if it hasn't been cached yet.
@@ -36,7 +45,7 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
             withContext(Dispatchers.IO) {
                 // Returns byte[] for audio art, Drawable for APK, Uri for images/videos
                 val loaded = file.loadIconInternal()
-                file.setCachedIcon(loaded)
+                file.cachedIcon = loaded
                 iconModel = loaded
             }
         }
@@ -75,21 +84,21 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                 modifier = Modifier.matchParentSize().padding(if (isImageType) 0.dp else 5.dp),
                 contentScale = if (isImageType) ContentScale.Crop else ContentScale.Fit,
                 requestBuilderTransform = {
-                    it.addListener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                    it.addListener(object : RequestListener<Drawable> {
                         override fun onLoadFailed(
-                            e: com.bumptech.glide.load.engine.GlideException?,
+                            e: GlideException?,
                             model: Any?,
-                            target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                            target: Target<Drawable>?,
                             isFirstResource: Boolean
                         ): Boolean {
                             isImageLoaded = true
                             return false
                         }
                         override fun onResourceReady(
-                            resource: android.graphics.drawable.Drawable?,
+                            resource: Drawable?,
                             model: Any?,
-                            target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
-                            dataSource: com.bumptech.glide.load.DataSource?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
                             isFirstResource: Boolean
                         ): Boolean {
                             isImageLoaded = true

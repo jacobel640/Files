@@ -101,7 +101,7 @@ public abstract class FragmentBase extends Fragment {
 
     FragmentType fragmentType;
 
-    FragmentBase(FragmentType fragmentType) {
+    public FragmentBase(FragmentType fragmentType) {
         this.fragmentType = fragmentType;
     }
 
@@ -119,7 +119,7 @@ public abstract class FragmentBase extends Fragment {
     JFileAdapter jFileAdapter;
     ArrayList<JFile> objects;
     Drawable star = null;
-    File parent = new File(""); // TODO make null
+    public File parent = new File(""); // TODO make null
     String itemPath;
     boolean running, selected, isArchive, canceled;
     public boolean bool = false;
@@ -248,7 +248,7 @@ public abstract class FragmentBase extends Fragment {
         else CATEGORY_VIEW_TYPE = viewType;
     }
 
-    abstract void onCreateView(View v);
+    public abstract void onCreateView(View v);
 
     void toolbarSetup() {
         // Home button

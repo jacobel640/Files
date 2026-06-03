@@ -1,4 +1,4 @@
-package com.example.files.fragments
+package com.example.files.presentation.search
 
 import android.os.Bundle
 import android.text.format.Formatter

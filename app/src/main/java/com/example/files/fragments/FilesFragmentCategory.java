@@ -73,7 +73,7 @@ public class FilesFragmentCategory extends FragmentBase {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
-    protected void onCreateView(View v) {
+    public void onCreateView(View v) {
 
         switch (category){
             case "video":

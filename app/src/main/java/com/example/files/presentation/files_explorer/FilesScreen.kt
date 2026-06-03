@@ -1,62 +1,172 @@
-package com.example.files.fragments
+package com.example.files.presentation.files_explorer
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.os.Environment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.automirrored.rounded.ArrowBackIos
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.GridView
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.RadioButtonUnchecked
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import android.view.View
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.layout.onGloballyPositioned
-import kotlin.math.roundToInt
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.files.MainActivity
 import com.example.files.R
 import com.example.files.Statics
+import com.example.files.actions.DialogCopy
+import com.example.files.actions.DialogCreateNew
+import com.example.files.actions.DialogDelete
+import com.example.files.actions.DialogDetails
+import com.example.files.actions.DialogMove
+import com.example.files.actions.DialogRename
+import com.example.files.actions.SortDialogContent
+import com.example.files.activities.SettingsActivity
+import com.example.files.components.FastScroller
+import com.example.files.components.FileIcon
+import com.example.files.components.PathBreadcrumbs
+import com.example.files.fragments.FragmentBase
+import com.example.files.listeners.OnMultiSelectedChange
 import com.example.files.models.JFile
 import com.example.files.utils.PathFormatter
 import com.example.files.viewmodels.FilesViewModel
-import androidx.activity.compose.BackHandler
-import com.example.files.actions.*
-import com.example.files.activities.SettingsActivity
-import android.content.Intent
-import androidx.compose.foundation.gestures.scrollBy
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import androidx.activity.compose.LocalActivity
+import kotlinx.coroutines.launch
+import java.io.File
+
+class FilesFragment : FragmentBase(FragmentType.FILES) {
+    private lateinit var filesViewModel: FilesViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.parent = Statics.folder
+        filesViewModel = ViewModelProvider(this)[FilesViewModel::class.java]
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MaterialTheme {
+                    Surface(color = MaterialTheme.colorScheme.background) {
+                        FilesScreen(
+                            viewModel = filesViewModel,
+                            onNavigateBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                            onNavigateToFolder = { file -> Statics.openFolder(File(file.path)) },
+                            onOpenFile = { file -> Statics.openFile(file, requireContext()) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onCreateView(v: View?) {}
+
+    override fun loadList() {
+        filesViewModel.refreshList(requireContext())
+    }
+
+    override fun refresh() {
+        filesViewModel.refreshList(requireContext())
+    }
+
+    override fun notVisible(): Boolean {
+        return !Statics.isVisible(Statics.TAG_FOLDER)
+    }
+
+    // Override to prevent NPE on binding since we completely replaced the XML view
+    override fun animate() {}
+    override fun refreshRecyclerPadding(addSpace: Boolean) {}
+    override fun refreshGrid() {}
+    override fun refreshActionsList() {}
+    override fun setListeners() {}
+
+    override fun setListListener() {
+        MainActivity.instance?.addMultiSelectedChangeListener(object : OnMultiSelectedChange {
+            override fun onMultiSelectedChange(multiSelected: Boolean) {
+                if (!multiSelected) {
+                    filesViewModel.clearSelection()
+                }
+            }
+            override fun onRefresh() {}
+            override fun onRefreshActionsList() {}
+        })
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +177,7 @@ fun FilesScreen(
     onOpenFile: (JFile) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val hapticFeedback = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val hapticFeedback = LocalHapticFeedback.current
     val context = LocalActivity.current as MainActivity
     var menuExpanded by remember { mutableStateOf(false) }
     var showSortDialog by remember { mutableStateOf(false) }
@@ -121,19 +231,40 @@ fun FilesScreen(
             Column {
                 LargeTopAppBar(
                     title = {
-                        Text(
-                            text = if (uiState.selectedFiles.isNotEmpty()) {
-                                stringResource(R.string.items_chosen, uiState.selectedFiles.size.toString())
-                            } else if (uiState.currentPath == android.os.Environment.getExternalStorageDirectory().path) {
-                                stringResource(R.string.internal_storage)
-                            } else {
-                                java.io.File(uiState.currentPath).name
-                            },
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Row(
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    if (uiState.selectedFiles.isNotEmpty()) viewModel.selectAll()
+                                }
+                            ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            if (uiState.selectedFiles.isNotEmpty()) {
+                                IconButton(onClick = { viewModel.selectAll() }) {
+                                    Icon(
+                                        imageVector = if (uiState.selectedFiles.size == uiState.files.size && uiState.files.isNotEmpty()) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
+                                        contentDescription = "Select All",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                            Text(
+                                text = if (uiState.selectedFiles.isNotEmpty()) {
+                                    stringResource(
+                                        R.string.items_chosen,
+                                        uiState.selectedFiles.size.toString()
+                                    )
+                                } else if (uiState.currentPath == Environment.getExternalStorageDirectory().path) {
+                                    stringResource(R.string.internal_storage)
+                                } else {
+                                    File(uiState.currentPath).name
+                                },
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = {
@@ -156,18 +287,6 @@ fun FilesScreen(
                                 Icon(
                                     painter = painterResource(id = if (uiState.isAllSelectedFavorites) R.drawable.star else R.drawable.star_outline),
                                     contentDescription = "Favorite",
-                                    tint = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                            Text(
-                                text = "${uiState.selectedFiles.size} selected",
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.align(Alignment.CenterVertically)
-                            )
-                            IconButton(onClick = { viewModel.selectAll() }) {
-                                Icon(
-                                    imageVector = if (uiState.selectedFiles.size == uiState.files.size && uiState.files.isNotEmpty()) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
-                                    contentDescription = "Select All",
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
@@ -260,13 +379,13 @@ fun FilesScreen(
                 )
                 
                 if (uiState.selectedFiles.isEmpty()) {
-                    com.example.files.components.PathBreadcrumbs(
+                    PathBreadcrumbs(
                         currentPath = uiState.currentPath,
                         onNavigate = { path ->
-                            onNavigateToFolder(com.example.files.models.JFile(java.io.File(path), context as android.app.Activity))
+                            onNavigateToFolder(JFile(File(path), context as Activity))
                         },
                         onHomeClick = {
-                            (context as? android.app.Activity)?.finish()
+                            (context as? Activity)?.finish()
                         }
                     )
                 }
@@ -293,7 +412,7 @@ fun FilesScreen(
                 Box(modifier = Modifier.fillMaxSize()) {
                     LazyVerticalGrid(
                     state = gridState,
-                    columns = if (uiState.isGridView) androidx.compose.foundation.lazy.grid.GridCells.Fixed(4) else androidx.compose.foundation.lazy.grid.GridCells.Fixed(1),
+                    columns = if (uiState.isGridView) GridCells.Fixed(4) else GridCells.Fixed(1),
                     contentPadding = if (uiState.isGridView) PaddingValues(8.dp) else PaddingValues(0.dp),
                     horizontalArrangement = if (uiState.isGridView) Arrangement.spacedBy(4.dp) else Arrangement.Start,
                     verticalArrangement = if (uiState.isGridView) Arrangement.spacedBy(4.dp) else Arrangement.Top,
@@ -301,10 +420,10 @@ fun FilesScreen(
                         .fillMaxSize()
                         .dragToSelectGrid(
                             state = gridState,
-                            onDragStart = { start -> 
+                            onDragStart = { start ->
                                 viewModel.isDragging = true
-                                hapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                                viewModel.startDragSelect(start) 
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                viewModel.startDragSelect(start)
                             },
                             onDragFinished = {
                                 viewModel.isDragging = false
@@ -318,7 +437,7 @@ fun FilesScreen(
                     items(uiState.files, key = { it.path }) { file ->
                         val iconContent = remember(file) {
                             movableContentOf {
-                                com.example.files.utils.FileIcon(
+                                FileIcon(
                                     file = file,
                                     modifier = Modifier.size(50.dp)
                                 )
@@ -349,8 +468,8 @@ fun FilesScreen(
                                 confirmValueChange = { dismissValue ->
                                     if (dismissValue == SwipeToDismissBoxValue.StartToEnd) {
                                         val selectedJFiles = arrayListOf(file)
-                                        Statics.prepareAction(com.example.files.actions.DialogCopy(selectedJFiles))
-                                        com.example.files.MainActivity.actionBarVisibility(android.view.View.VISIBLE)
+                                        Statics.prepareAction(DialogCopy(selectedJFiles))
+                                        MainActivity.actionBarVisibility(View.VISIBLE)
                                     }
                                     false // Never actually dismiss the item from the UI
                                 }
@@ -401,19 +520,20 @@ fun FilesScreen(
                         }
                     }
                 } // End of LazyVerticalGrid
-                    
-                com.example.files.components.FastScroller(
-                    gridState = gridState,
-                    items = uiState.files,
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    sortMode = currentSort
-                )
+
+                    FastScroller(
+                        gridState = gridState,
+                        items = uiState.files,
+                        modifier = Modifier.align(Alignment.TopEnd),
+                        sortMode = currentSort
+                    )
             }
         }
     }
 }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun Modifier.dragToSelectGrid(
     state: LazyGridState,
     onDragStart: (Int) -> Unit,
@@ -421,23 +541,23 @@ fun Modifier.dragToSelectGrid(
     onSelectRange: (Int, Int) -> Unit
 ): Modifier = this.pointerInput(Unit) {
     var initialIndex: Int? = null
-    var autoScrollJob: kotlinx.coroutines.Job? = null
-    var currentPointerPosition: androidx.compose.ui.geometry.Offset? = null
+    var autoScrollJob: Job? = null
+    var currentPointerPosition: Offset? = null
     
     detectDragGesturesAfterLongPress(
         onDragStart = { offset ->
-            if (com.example.files.Statics.copyMode) return@detectDragGesturesAfterLongPress
+            if (Statics.copyMode) return@detectDragGesturesAfterLongPress
             val item = state.layoutInfo.visibleItemsInfo.find {
                 offset.x >= it.offset.x && offset.x <= it.offset.x + it.size.width &&
                 offset.y >= it.offset.y && offset.y <= it.offset.y + it.size.height
             }
             initialIndex = item?.index
-            initialIndex?.let {
-                onDragStart(it)
-                onSelectRange(it, it)
+            initialIndex?.let { initIndext ->
+                onDragStart(initIndext)
+                onSelectRange(initIndext, initIndext)
                 currentPointerPosition = offset
                 
-                autoScrollJob = kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                autoScrollJob = GlobalScope.launch(Dispatchers.Main) {
                     while (isActive) {
                         currentPointerPosition?.let { pos ->
                             val topThreshold = 100.dp.toPx()

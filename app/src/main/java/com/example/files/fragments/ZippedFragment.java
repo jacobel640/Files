@@ -64,7 +64,7 @@ public class ZippedFragment extends FragmentBase {
     }
 
     @Override
-    void onCreateView(View v) {
+    public void onCreateView(View v) {
 
     }
 

@@ -47,7 +47,7 @@ public class RecentFragment extends FragmentBase {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
-    void onCreateView(View v) {
+    public void onCreateView(View v) {
 
         pathNavigator.tvPath.setText(R.string.recent_files);
         binding.folderName.setText(R.string.recent_files);
