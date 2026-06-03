@@ -162,9 +162,10 @@
     <string name="title_self_update">Self Update</string>
     <string name="title_changelog">Changelog</string>
     <string name="download_update">Download Update</string>
-    <string name="aplying_dynamic_theme_message">הפעולה מתבצעת...</string>
-    <string name="choose_theme_color">בחר צבע ערכת נושא</string>
-    <string name="apply_theme_color">החל</string>
-    <string name="reset_default_theme_color">איפוס</string>
+    <string name="aplying_dynamic_theme_message">Applying dynamic theme...</string>
+    <string name="choose_theme_color">Choose theme color</string>
+    <string name="apply_theme_color">Apply</string>
+    <string name="reset_default_theme_color">Reset</string>
     <string name="no_results">No Results</string>
+    <string name="location">Location</string>
 </resources>

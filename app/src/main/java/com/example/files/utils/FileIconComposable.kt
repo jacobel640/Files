@@ -35,7 +35,9 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
         if (iconModel == null) {
             withContext(Dispatchers.IO) {
                 // Returns byte[] for audio art, Drawable for APK, Uri for images/videos
-                iconModel = file.loadIconInternal()
+                val loaded = file.loadIconInternal()
+                file.setCachedIcon(loaded)
+                iconModel = loaded
             }
         }
     }
@@ -57,6 +59,8 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
     // Check if the loaded model is essentially "just a placeholder" and not real media.
     val isJustPlaceholder = iconModel is Drawable || iconModel == null || iconModel is Int
 
+    var isImageLoaded by remember(iconModel) { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -70,11 +74,34 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                 contentDescription = null,
                 modifier = Modifier.matchParentSize().padding(if (isImageType) 0.dp else 5.dp),
                 contentScale = if (isImageType) ContentScale.Crop else ContentScale.Fit,
+                requestBuilderTransform = {
+                    it.addListener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                        override fun onLoadFailed(
+                            e: com.bumptech.glide.load.engine.GlideException?,
+                            model: Any?,
+                            target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            isImageLoaded = true
+                            return false
+                        }
+                        override fun onResourceReady(
+                            resource: android.graphics.drawable.Drawable?,
+                            model: Any?,
+                            target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                            dataSource: com.bumptech.glide.load.DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            isImageLoaded = true
+                            return false
+                        }
+                    })
+                },
                 loading = placeholder {
                     Image(
                         painter = painterResource(id = typeResourceId),
                         contentDescription = null,
-                        modifier = Modifier.matchParentSize().padding(5.dp),
+                        modifier = Modifier.matchParentSize().padding(if (isImageType) 5.dp else 0.dp),
                         contentScale = ContentScale.Fit
                     )
                 },
@@ -82,13 +109,13 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                     Image(
                         painter = painterResource(id = typeResourceId),
                         contentDescription = null,
-                        modifier = Modifier.matchParentSize().padding(5.dp),
+                        modifier = Modifier.matchParentSize().padding(if (isImageType) 5.dp else 0.dp),
                         contentScale = ContentScale.Fit
                     )
                 }
             )
         } else {
-            // Fallback placeholder while loading or if it is just a drawable
+            // Fallback placeholder while loading or if it is just a drawable/int
             Image(
                 painter = painterResource(id = typeResourceId),
                 contentDescription = null,
@@ -98,7 +125,7 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
         }
 
         // 2. Frame Border & Corner Indicator Overlay
-        if (!isJustPlaceholder && isImageType) {
+        if (!isJustPlaceholder && isImageType && isImageLoaded) {
             // Frame overlay (slight gentle border)
             Box(
                 modifier = Modifier

@@ -247,6 +247,10 @@ public class JFile extends File implements Comparable<File> {
         return cachedIcon;
     }
 
+    public void setCachedIcon(Object icon) {
+        this.cachedIcon = icon;
+    }
+
     public boolean isIconReady() {
         return cachedIcon != null;
     }
@@ -274,7 +278,7 @@ public class JFile extends File implements Comparable<File> {
     @SuppressLint({"UseCompatLoadingForDrawables", "StaticFieldLeak"})
     public Object loadIconInternal() {
         if (isDirectory()) {
-            return activity.getDrawable(R.drawable.folder);
+            return R.drawable.folder;
         } else switch (getExtension().toLowerCase()) {
             case "aac":
             case "amr":
@@ -291,7 +295,7 @@ public class JFile extends File implements Comparable<File> {
                     if (art != null) return art;
                 } catch (Exception ignored) {
                 }
-                return activity.getDrawable(R.drawable.ctg_audio);
+                return R.drawable.ctg_audio;
             case "apk":
                 try {
                     PackageInfo packageInfo = activity.getPackageManager().getPackageArchiveInfo(getPath(), PackageManager.GET_ACTIVITIES);
@@ -304,7 +308,7 @@ public class JFile extends File implements Comparable<File> {
                     }
                 } catch (Exception ignored) {
                 }
-                return activity.getDrawable(R.drawable.ext_apk);
+                return R.drawable.ext_apk;
             // photo
             case "cr2":
             case "dng":
@@ -332,23 +336,23 @@ public class JFile extends File implements Comparable<File> {
             case "jar":
             case "rar":
             case "zip":
-                return activity.getDrawable(R.drawable.ctg_archive);
+                return R.drawable.ctg_archive;
             case "docx":
             case "doc":
-                return activity.getDrawable(R.drawable.ext_word);
+                return R.drawable.ext_word;
             case "xls":
             case "xlsx":
-                return activity.getDrawable(R.drawable.ext_excel);
+                return R.drawable.ext_excel;
             case "pptx":
-                return activity.getDrawable(R.drawable.ext_powerpoint);
+                return R.drawable.ext_powerpoint;
             case "pdf":
-                return activity.getDrawable(R.drawable.ext_pdf);
+                return R.drawable.ext_pdf;
             case "txt":
-                return activity.getDrawable(R.drawable.ext_txt);
+                return R.drawable.ext_txt;
             case "html":
                 return backgroundDrawable();
             default:
-                return activity.getDrawable(R.drawable.file);
+                return R.drawable.file;
 			/*
 			case "txt":
 			case "lrc":

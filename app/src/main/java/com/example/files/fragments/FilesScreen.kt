@@ -1,0 +1,524 @@
+package com.example.files.fragments
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.automirrored.rounded.ArrowBackIos
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
+import android.view.View
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import kotlin.math.roundToInt
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.files.MainActivity
+import com.example.files.R
+import com.example.files.Statics
+import com.example.files.models.JFile
+import com.example.files.utils.PathFormatter
+import com.example.files.viewmodels.FilesViewModel
+import androidx.activity.compose.BackHandler
+import com.example.files.actions.*
+import com.example.files.activities.SettingsActivity
+import android.content.Intent
+import androidx.compose.foundation.gestures.scrollBy
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import androidx.activity.compose.LocalActivity
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilesScreen(
+    viewModel: FilesViewModel = viewModel(),
+    onNavigateBack: () -> Unit,
+    onNavigateToFolder: (JFile) -> Unit,
+    onOpenFile: (JFile) -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val hapticFeedback = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val context = LocalActivity.current as MainActivity
+    var menuExpanded by remember { mutableStateOf(false) }
+    var showSortDialog by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val formattedPath = remember(uiState.currentPath) {
+        val full = PathFormatter(context).format(uiState.currentPath)
+        full.split("/").lastOrNull() ?: uiState.currentPathName
+    }
+
+    // Trigger load when screen starts or path changes
+    LaunchedEffect(Unit) {
+        viewModel.refreshList(context)
+    }
+
+    BackHandler(enabled = uiState.selectedFiles.isNotEmpty()) {
+        viewModel.clearSelection()
+    }
+
+    LaunchedEffect(uiState.selectedFiles.size) {
+        if (uiState.selectedFiles.isNotEmpty()) {
+            MainActivity.actionBarVisibility(View.VISIBLE)
+        } else if (!Statics.copyMode) {
+            MainActivity.actionBarVisibility(View.GONE)
+        }
+    }
+
+    if (showSortDialog) {
+        ModalBottomSheet(onDismissRequest = { showSortDialog = false }) {
+            SortDialogContent(
+                initialSort = Statics.sort,
+                initialOrder = Statics.order,
+                onApply = { selectedSort, selectedOrder ->
+                    Statics.sort = selectedSort
+                    Statics.order = selectedOrder
+                    MainActivity.editor.putInt("SORT", selectedSort).apply()
+                    MainActivity.editor.putInt("ORDER", selectedOrder).apply()
+                    showSortDialog = false
+                    viewModel.refreshList(context)
+                },
+                onCancel = { showSortDialog = false }
+            )
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            var titleHeightPx by remember { mutableFloatStateOf(0f) }
+            LaunchedEffect(titleHeightPx) {
+                if (titleHeightPx > 0f) {
+                    scrollBehavior.state.heightOffsetLimit = -titleHeightPx
+                }
+            }
+            
+            val offset = scrollBehavior.state.heightOffset
+            
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    val newHeight = (placeable.height + offset).roundToInt().coerceAtLeast(0)
+                    layout(placeable.width, newHeight) {
+                        placeable.place(0, offset.roundToInt())
+                    }
+                }
+                .clipToBounds()
+            ) {
+                // Title Row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .onGloballyPositioned { titleHeightPx = it.size.height.toFloat() }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (uiState.selectedFiles.isNotEmpty()) {
+                            stringResource(R.string.items_chosen, uiState.selectedFiles.size.toString())
+                        } else if (uiState.currentPath == android.os.Environment.getExternalStorageDirectory().path) {
+                            stringResource(R.string.internal_storage)
+                        } else {
+                            java.io.File(uiState.currentPath).name
+                        },
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 28.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                
+                // Toolbar Row
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = {
+                        if (uiState.selectedFiles.isNotEmpty()) {
+                            viewModel.clearSelection()
+                        } else {
+                            onNavigateBack()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBackIos,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.weight(1f))
+                    
+                    if (uiState.selectedFiles.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.toggleFavorite(context) }) {
+                            Icon(
+                                painter = painterResource(id = if (uiState.isAllSelectedFavorites) R.drawable.star else R.drawable.star_outline),
+                                contentDescription = "Favorite",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Text(
+                            text = "${uiState.selectedFiles.size} selected",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                        IconButton(onClick = { viewModel.selectAll() }) {
+                            Icon(
+                                imageVector = if (uiState.selectedFiles.size == uiState.files.size && uiState.files.isNotEmpty()) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
+                                contentDescription = "Select All",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = { viewModel.toggleViewType() }) {
+                            Icon(
+                                imageVector = if (uiState.isGridView) Icons.AutoMirrored.Rounded.List else Icons.Rounded.GridView,
+                                contentDescription = "Toggle View",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        IconButton(onClick = { Statics.OpenSearch(Statics.TAG_FOLDER) }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Search,
+                                contentDescription = "Search",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                    
+                    Box {
+                        IconButton(onClick = { menuExpanded = true }) {
+                            Icon(Icons.Rounded.MoreVert, contentDescription = "More options", tint = MaterialTheme.colorScheme.onSurface)
+                        }
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
+                            val selectedSize = uiState.selectedFiles.size
+                            if (selectedSize == 0) {
+                                DropdownMenuItem(text = { Text(stringResource(R.string.create_new)) }, onClick = { 
+                                    menuExpanded = false
+                                    DialogCreateNew(context, false) 
+                                })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.sort_by)) }, onClick = { 
+                                    menuExpanded = false
+                                    showSortDialog = true
+                                })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.settings)) }, onClick = { 
+                                    menuExpanded = false
+                                    context.startActivity(Intent(context, SettingsActivity::class.java))
+                                })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.refresh)) }, onClick = { 
+                                    menuExpanded = false
+                                    viewModel.refreshList(context)
+                                })
+                            } else if (selectedSize == 1) {
+                                DropdownMenuItem(text = { Text(stringResource(R.string.rename)) }, onClick = { 
+                                    menuExpanded = false
+                                    DialogRename(context)
+                                })
+                                if (!uiState.selectedFiles[0].isDirectory) {
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.open_with)) }, onClick = { 
+                                        menuExpanded = false
+                                        Statics.openFileWith(uiState.selectedFiles[0], context)
+                                    })
+                                }
+                                DropdownMenuItem(text = { Text(stringResource(R.string.details)) }, onClick = { 
+                                    menuExpanded = false
+                                    DialogDetails(context, false)
+                                })
+                            }
+                            
+                            if (selectedSize > 0) {
+                                DropdownMenuItem(text = { Text(stringResource(R.string.move)) }, onClick = { 
+                                    menuExpanded = false
+                                    Statics.prepareAction(DialogMove(ArrayList(uiState.selectedFiles)))
+                                    viewModel.clearSelection()
+                                })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.copy_action)) }, onClick = { 
+                                    menuExpanded = false
+                                    Statics.prepareAction(DialogCopy(ArrayList(uiState.selectedFiles)))
+                                    viewModel.clearSelection()
+                                })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.delete)) }, onClick = { 
+                                    menuExpanded = false
+                                    Statics.prepareAction(DialogDelete(ArrayList(uiState.selectedFiles)))
+                                    viewModel.clearSelection()
+                                })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.add_to_favorites)) }, onClick = { 
+                                    menuExpanded = false
+                                    uiState.selectedFiles.forEach { Statics.favorites.addToFavorites(it) }
+                                    viewModel.clearSelection()
+                                })
+                            }
+                        }
+                    }
+                }
+                
+                if (uiState.selectedFiles.isEmpty()) {
+                    com.example.files.components.PathBreadcrumbs(
+                        currentPath = uiState.currentPath,
+                        onNavigate = { path ->
+                            onNavigateToFolder(com.example.files.models.JFile(java.io.File(path), context as android.app.Activity))
+                        },
+                        onHomeClick = {
+                            (context as? android.app.Activity)?.finish()
+                        }
+                    )
+                }
+            }
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            if (uiState.isLoading && uiState.files.isEmpty()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (uiState.files.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.nothing_in_here),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                val gridState = rememberLazyGridState()
+                Box(modifier = Modifier.fillMaxSize()) {
+                    LazyVerticalGrid(
+                    state = gridState,
+                    columns = if (uiState.isGridView) androidx.compose.foundation.lazy.grid.GridCells.Fixed(4) else androidx.compose.foundation.lazy.grid.GridCells.Fixed(1),
+                    contentPadding = if (uiState.isGridView) PaddingValues(8.dp) else PaddingValues(0.dp),
+                    horizontalArrangement = if (uiState.isGridView) Arrangement.spacedBy(4.dp) else Arrangement.Start,
+                    verticalArrangement = if (uiState.isGridView) Arrangement.spacedBy(4.dp) else Arrangement.Top,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .dragToSelectGrid(
+                            state = gridState,
+                            onDragStart = { start -> 
+                                viewModel.isDragging = true
+                                hapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                viewModel.startDragSelect(start) 
+                            },
+                            onDragFinished = {
+                                viewModel.isDragging = false
+                                viewModel.lastDragEndTime = System.currentTimeMillis()
+                            },
+                            onSelectRange = { start, end ->
+                                viewModel.selectRange(start, end)
+                            }
+                        )
+                ) {
+                    items(uiState.files, key = { it.path }) { file ->
+                        val iconContent = remember(file) {
+                            movableContentOf {
+                                com.example.files.utils.FileIcon(
+                                    file = file,
+                                    modifier = Modifier.size(50.dp)
+                                )
+                            }
+                        }
+                        if (uiState.isGridView) {
+                            FileGridItem(
+                                file = file,
+                                isSelected = uiState.selectedFiles.contains(file),
+                                onClick = {
+                                    if (viewModel.isDragging || System.currentTimeMillis() - viewModel.lastDragEndTime < 300) {
+                                        return@FileGridItem
+                                    }
+                                    if (uiState.selectedFiles.isNotEmpty()) {
+                                        viewModel.toggleSelection(file)
+                                    } else {
+                                        if (file.isDirectory) onNavigateToFolder(file)
+                                        else onOpenFile(file)
+                                    }
+                                },
+                                onLongClick = {
+                                    viewModel.toggleSelection(file)
+                                },
+                                iconContent = iconContent
+                            )
+                        } else {
+                            val dismissState = rememberSwipeToDismissBoxState(
+                                confirmValueChange = { dismissValue ->
+                                    if (dismissValue == SwipeToDismissBoxValue.StartToEnd) {
+                                        val selectedJFiles = arrayListOf(file)
+                                        Statics.prepareAction(com.example.files.actions.DialogCopy(selectedJFiles))
+                                        com.example.files.MainActivity.actionBarVisibility(android.view.View.VISIBLE)
+                                    }
+                                    false // Never actually dismiss the item from the UI
+                                }
+                            )
+
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                enableDismissFromEndToStart = false,
+                                enableDismissFromStartToEnd = true,
+                                backgroundContent = {
+                                    val color = MaterialTheme.colorScheme.primary
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(color)
+                                            .padding(horizontal = 16.dp),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.action_copy),
+                                            contentDescription = "Copy",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                }
+                            ) {
+                                FileRowItem(
+                                    file = file,
+                                    isSelected = uiState.selectedFiles.contains(file),
+                                    onClick = {
+                                        if (viewModel.isDragging || System.currentTimeMillis() - viewModel.lastDragEndTime < 300) {
+                                            return@FileRowItem
+                                        }
+                                        if (uiState.selectedFiles.isNotEmpty()) {
+                                            viewModel.toggleSelection(file)
+                                        } else {
+                                            if (file.isDirectory) onNavigateToFolder(file)
+                                            else onOpenFile(file)
+                                        }
+                                    },
+                                    onLongClick = {
+                                        viewModel.toggleSelection(file)
+                                    },
+                                    iconContent = iconContent
+                                )
+                            }
+                        }
+                    }
+                } // End of LazyVerticalGrid
+                    
+                com.example.files.components.FastScroller(
+                    gridState = gridState,
+                    items = uiState.files,
+                    modifier = Modifier.align(Alignment.TopEnd)
+                )
+            }
+        }
+    }
+}
+}
+
+fun Modifier.dragToSelectGrid(
+    state: LazyGridState,
+    onDragStart: (Int) -> Unit,
+    onDragFinished: () -> Unit,
+    onSelectRange: (Int, Int) -> Unit
+): Modifier = this.pointerInput(Unit) {
+    var initialIndex: Int? = null
+    var autoScrollJob: kotlinx.coroutines.Job? = null
+    var currentPointerPosition: androidx.compose.ui.geometry.Offset? = null
+    
+    detectDragGesturesAfterLongPress(
+        onDragStart = { offset ->
+            if (com.example.files.Statics.copyMode) return@detectDragGesturesAfterLongPress
+            val item = state.layoutInfo.visibleItemsInfo.find {
+                offset.x >= it.offset.x && offset.x <= it.offset.x + it.size.width &&
+                offset.y >= it.offset.y && offset.y <= it.offset.y + it.size.height
+            }
+            initialIndex = item?.index
+            initialIndex?.let {
+                onDragStart(it)
+                onSelectRange(it, it)
+                currentPointerPosition = offset
+                
+                autoScrollJob = kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.Main) {
+                    while (isActive) {
+                        currentPointerPosition?.let { pos ->
+                            val topThreshold = 100.dp.toPx()
+                            val bottomThreshold = size.height - 100.dp.toPx()
+                            var scrollSpeed = 0f
+                            
+                            if (pos.y < topThreshold) {
+                                val ratio = (topThreshold - pos.y).coerceAtLeast(0f) / topThreshold
+                                scrollSpeed = -(ratio * 30f)
+                            } else if (pos.y > bottomThreshold) {
+                                val ratio = (pos.y - bottomThreshold).coerceAtLeast(0f) / (size.height - bottomThreshold)
+                                scrollSpeed = (ratio * 30f)
+                            }
+                            
+                            if (scrollSpeed != 0f) {
+                                state.scrollBy(scrollSpeed)
+                                val currentItem = state.layoutInfo.visibleItemsInfo.find {
+                                    pos.x >= it.offset.x && pos.x <= it.offset.x + it.size.width &&
+                                    pos.y >= it.offset.y && pos.y <= it.offset.y + it.size.height
+                                }
+                                currentItem?.index?.let { currentIdx ->
+                                    onSelectRange(initialIndex!!, currentIdx)
+                                }
+                            }
+                        }
+                        delay(16)
+                    }
+                }
+            }
+        },
+        onDrag = { change, _ ->
+            if (initialIndex == null) return@detectDragGesturesAfterLongPress
+            currentPointerPosition = change.position
+            val item = state.layoutInfo.visibleItemsInfo.find {
+                change.position.x >= it.offset.x && change.position.x <= it.offset.x + it.size.width &&
+                change.position.y >= it.offset.y && change.position.y <= it.offset.y + it.size.height
+            }
+            item?.index?.let { current ->
+                onSelectRange(initialIndex!!, current)
+            }
+        },
+        onDragEnd = { 
+            initialIndex = null 
+            currentPointerPosition = null
+            autoScrollJob?.cancel()
+            onDragFinished()
+        },
+        onDragCancel = { 
+            initialIndex = null 
+            currentPointerPosition = null
+            autoScrollJob?.cancel()
+            onDragFinished()
+        }
+    )
+}

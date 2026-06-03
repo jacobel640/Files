@@ -141,6 +141,10 @@ public class MainActivity extends BaseActivity {
         instance = this;
         cleanCache(this);
         hideKeyboard(this);
+        
+        androidx.compose.ui.platform.ComposeView activeTasksComposeView = findViewById(R.id.active_tasks_compose_view);
+        com.example.files.components.ActiveTasksOverlayKt.bindActiveTasksOverlay(activeTasksComposeView);
+
         if (currentFragment == null) statics(); // --------------------------------- //
 
         if (!permissionGranted()) requestStoragePermissions();
@@ -304,17 +308,13 @@ public class MainActivity extends BaseActivity {
     }
 
     public void requestStoragePermissions() {
-        ActivityCompat.requestPermissions(this,
-                    new String[] {
-                            Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    },
-                    100);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
-                    100);
+        java.util.List<String> permissions = new java.util.ArrayList<>();
+        permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS);
         }
+        ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), 100);
     }
 
     @Override

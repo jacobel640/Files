@@ -28,8 +28,9 @@ public class PathFormatter {
         for (String s : preArr) {
             if (!s.equals("")) pathArray.add(s);
         }
+        if (pathArray.isEmpty()) return path;
         StringBuilder pathBuilder = new StringBuilder();
-        if (pathArray.get(0).equals("storage")) {
+        if (pathArray.get(0).equals("storage") && pathArray.size() > 1) {
             if (pathArray.get(1).equals("emulated")) {
                 for (int i = 2; i < pathArray.size(); i++) {
                     if (i == 2) pathBuilder.append(pathArray.get(i).replace("0",

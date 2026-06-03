@@ -34,8 +34,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/name"
                 android:textStyle="bold"
-                android:paddingRight="1dp"
-                android:paddingLeft="1dp"
+                android:paddingEnd="1dp"
+                android:paddingStart="1dp"
                 />
 
             <TextView
@@ -45,8 +45,8 @@
                 android:singleLine="false"
                 android:text="@string/copying"
                 android:textSize="12sp"
-                android:paddingRight="1dp"
-                android:paddingLeft="1dp"
+                android:paddingEnd="1dp"
+                android:paddingStart="1dp"
                 />
 
         </LinearLayout>
@@ -55,8 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom"
-            android:paddingRight="1dp"
-            android:paddingLeft="1dp"
+            android:paddingEnd="1dp"
+            android:paddingStart="1dp"
             android:indeterminate="true"
             app:indicatorColor="@color/app_theme"
             app:trackColor="@color/divider"
