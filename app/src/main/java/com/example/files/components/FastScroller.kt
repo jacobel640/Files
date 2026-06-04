@@ -70,9 +70,25 @@ fun FastScroller(
         }
     }
 
-    val proportion = if (totalItemsCount > 1) {
-        gridState.firstVisibleItemIndex.toFloat() / (totalItemsCount - 1)
-    } else 0f
+    val proportion by remember(totalItemsCount) {
+        derivedStateOf {
+            if (totalItemsCount <= 1) return@derivedStateOf 0f
+            val layoutInfo = gridState.layoutInfo
+            if (layoutInfo.visibleItemsInfo.isEmpty()) return@derivedStateOf 0f
+
+            val firstVisibleItem = layoutInfo.visibleItemsInfo.first()
+            val itemsPerRow = layoutInfo.visibleItemsInfo.count { it.offset.y == firstVisibleItem.offset.y }.coerceAtLeast(1)
+            val estimatedRowHeight = firstVisibleItem.size.height + layoutInfo.mainAxisItemSpacing
+
+            val exactIndex = if (estimatedRowHeight > 0) {
+                gridState.firstVisibleItemIndex.toFloat() + (gridState.firstVisibleItemScrollOffset.toFloat() / estimatedRowHeight) * itemsPerRow
+            } else {
+                gridState.firstVisibleItemIndex.toFloat()
+            }
+
+            (exactIndex / (totalItemsCount - 1)).coerceIn(0f, 1f)
+        }
+    }
     
     var isVisible by remember { mutableStateOf(false) }
     
