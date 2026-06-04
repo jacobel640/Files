@@ -58,6 +58,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.composed
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -394,7 +396,11 @@ fun FilesScreen(
                     scrollBehavior = scrollBehavior
                 )
                 
-                if (uiState.selectedFiles.isEmpty()) {
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = uiState.selectedFiles.isEmpty(),
+                    enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
+                    exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
+                ) {
                     PathBreadcrumbs(
                         currentPath = uiState.currentPath,
                         onNavigate = { path ->
@@ -572,24 +578,31 @@ fun Modifier.dragToSelectGrid(
     onDragStart: (Int) -> Unit,
     onDragFinished: () -> Unit,
     onSelectRange: (Int, Int) -> Unit
-): Modifier = this.pointerInput(Unit) {
-    var initialIndex: Int? = null
-    var autoScrollJob: Job? = null
-    var currentPointerPosition: Offset? = null
-    
-    detectDragGesturesAfterLongPress(
-        onDragStart = { offset ->
-            if (Statics.copyMode) return@detectDragGesturesAfterLongPress
-            val item = state.layoutInfo.visibleItemsInfo.find {
-                val startY = it.offset.y + topPaddingPx
-                val startX = it.offset.x + startPaddingPx
+): Modifier = composed {
+    val currentTopPadding by rememberUpdatedState(topPaddingPx)
+    val currentStartPadding by rememberUpdatedState(startPaddingPx)
+    val currentOnDragStart by rememberUpdatedState(onDragStart)
+    val currentOnDragFinished by rememberUpdatedState(onDragFinished)
+    val currentOnSelectRange by rememberUpdatedState(onSelectRange)
+
+    this.pointerInput(Unit) {
+        var initialIndex: Int? = null
+        var autoScrollJob: Job? = null
+        var currentPointerPosition: Offset? = null
+        
+        detectDragGesturesAfterLongPress(
+            onDragStart = { offset ->
+                if (Statics.copyMode) return@detectDragGesturesAfterLongPress
+                val item = state.layoutInfo.visibleItemsInfo.find {
+                    val startY = it.offset.y + currentTopPadding
+                    val startX = it.offset.x + currentStartPadding
                 offset.x >= startX && offset.x <= startX + it.size.width &&
                 offset.y >= startY && offset.y <= startY + it.size.height
             }
             initialIndex = item?.index
             initialIndex?.let { initIndext ->
-                onDragStart(initIndext)
-                onSelectRange(initIndext, initIndext)
+                currentOnDragStart(initIndext)
+                currentOnSelectRange(initIndext, initIndext)
                 currentPointerPosition = offset
                 
                 autoScrollJob = GlobalScope.launch(Dispatchers.Main) {
@@ -610,13 +623,13 @@ fun Modifier.dragToSelectGrid(
                             if (scrollSpeed != 0f) {
                                 state.scrollBy(scrollSpeed)
                                 val currentItem = state.layoutInfo.visibleItemsInfo.find {
-                                    val startY = it.offset.y + topPaddingPx
-                                    val startX = it.offset.x + startPaddingPx
+                                    val startY = it.offset.y + currentTopPadding
+                                    val startX = it.offset.x + currentStartPadding
                                     pos.x >= startX && pos.x <= startX + it.size.width &&
                                     pos.y >= startY && pos.y <= startY + it.size.height
                                 }
                                 currentItem?.index?.let { currentIdx ->
-                                    onSelectRange(initialIndex!!, currentIdx)
+                                    currentOnSelectRange(initialIndex!!, currentIdx)
                                 }
                             }
                         }
@@ -629,26 +642,27 @@ fun Modifier.dragToSelectGrid(
             if (initialIndex == null) return@detectDragGesturesAfterLongPress
             currentPointerPosition = change.position
             val item = state.layoutInfo.visibleItemsInfo.find {
-                val startY = it.offset.y + topPaddingPx
-                val startX = it.offset.x + startPaddingPx
+                val startY = it.offset.y + currentTopPadding
+                val startX = it.offset.x + currentStartPadding
                 change.position.x >= startX && change.position.x <= startX + it.size.width &&
                 change.position.y >= startY && change.position.y <= startY + it.size.height
             }
             item?.index?.let { current ->
-                onSelectRange(initialIndex!!, current)
+                currentOnSelectRange(initialIndex!!, current)
             }
         },
         onDragEnd = { 
             initialIndex = null 
             currentPointerPosition = null
             autoScrollJob?.cancel()
-            onDragFinished()
+            currentOnDragFinished()
         },
         onDragCancel = { 
             initialIndex = null 
             currentPointerPosition = null
             autoScrollJob?.cancel()
-            onDragFinished()
+            currentOnDragFinished()
         }
     )
+}
 }
