@@ -105,11 +105,20 @@ fun FastScroller(
                 .width(48.dp)
                 .pointerInput(Unit) {
                     detectDragGestures(
-                        onDragStart = { 
+                        onDragStart = { offset ->
                             isDragging = true
                             val thumbHeightPx = thumbHeight.toPx()
                             val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
-                            dragY = (maxOffset * proportion).coerceIn(0f, maxOffset)
+                            
+                            // Center the thumb on the touch offset, clamped to bounds
+                            dragY = (offset.y - thumbHeightPx / 2f).coerceIn(0f, maxOffset)
+                            
+                            // Scroll immediately to the new position
+                            val targetProportion = if (maxOffset > 0) dragY / maxOffset else 0f
+                            val targetIndex = (targetProportion * totalItemsCount).toInt().coerceIn(0, totalItemsCount - 1)
+                            coroutineScope.launch {
+                                gridState.scrollToItem(targetIndex)
+                            }
                         },
                         onDragEnd = { isDragging = false },
                         onDragCancel = { isDragging = false },
@@ -131,7 +140,11 @@ fun FastScroller(
 
         val thumbHeightPx = with(context.resources.displayMetrics) { thumbHeight.value * density }
         val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
-        val yOffset = (maxOffset * proportion).coerceIn(0f, maxOffset)
+        val yOffset = if (isDragging) {
+            dragY.coerceIn(0f, maxOffset)
+        } else {
+            (maxOffset * proportion).coerceIn(0f, maxOffset)
+        }
         
         if (thumbAlpha > 0f) {
             Row(
