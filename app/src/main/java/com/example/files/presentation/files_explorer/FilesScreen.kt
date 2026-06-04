@@ -572,8 +572,9 @@ fun Modifier.dragToSelectGrid(
         onDragStart = { offset ->
             if (Statics.copyMode) return@detectDragGesturesAfterLongPress
             val item = state.layoutInfo.visibleItemsInfo.find {
+                val startY = it.offset.y + state.layoutInfo.viewportStartOffset
                 offset.x >= it.offset.x && offset.x <= it.offset.x + it.size.width &&
-                offset.y >= it.offset.y && offset.y <= it.offset.y + it.size.height
+                offset.y >= startY && offset.y <= startY + it.size.height
             }
             initialIndex = item?.index
             initialIndex?.let { initIndext ->
@@ -599,8 +600,9 @@ fun Modifier.dragToSelectGrid(
                             if (scrollSpeed != 0f) {
                                 state.scrollBy(scrollSpeed)
                                 val currentItem = state.layoutInfo.visibleItemsInfo.find {
+                                    val startY = it.offset.y + state.layoutInfo.viewportStartOffset
                                     pos.x >= it.offset.x && pos.x <= it.offset.x + it.size.width &&
-                                    pos.y >= it.offset.y && pos.y <= it.offset.y + it.size.height
+                                    pos.y >= startY && pos.y <= startY + it.size.height
                                 }
                                 currentItem?.index?.let { currentIdx ->
                                     onSelectRange(initialIndex!!, currentIdx)
@@ -616,8 +618,9 @@ fun Modifier.dragToSelectGrid(
             if (initialIndex == null) return@detectDragGesturesAfterLongPress
             currentPointerPosition = change.position
             val item = state.layoutInfo.visibleItemsInfo.find {
+                val startY = it.offset.y + state.layoutInfo.viewportStartOffset
                 change.position.x >= it.offset.x && change.position.x <= it.offset.x + it.size.width &&
-                change.position.y >= it.offset.y && change.position.y <= it.offset.y + it.size.height
+                change.position.y >= startY && change.position.y <= startY + it.size.height
             }
             item?.index?.let { current ->
                 onSelectRange(initialIndex!!, current)
