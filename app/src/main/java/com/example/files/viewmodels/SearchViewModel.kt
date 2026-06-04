@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class SearchUiState(
     val isLoading: Boolean = false,
@@ -17,7 +19,8 @@ data class SearchUiState(
     val error: String? = null
 )
 
-class SearchViewModel(private val repository: FileRepository) : ViewModel() {
+@HiltViewModel
+class SearchViewModel @Inject constructor(private val repository: FileRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()

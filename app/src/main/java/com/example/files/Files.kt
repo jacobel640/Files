@@ -4,6 +4,9 @@ import android.app.Application
 import com.example.files.utils.ThemeManager
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.DynamicColorsOptions
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
 class Files : Application() {
 
     override fun onCreate() {

@@ -165,7 +165,7 @@ public class DialogCreateNew extends Dialog {
     }
 
     public static boolean createNewFile(JFile jFile) {
-        Activity activity = jFile.getActivity();
+        android.content.Context activity = jFile.getContext();
         AtomicBoolean created = new AtomicBoolean(false);
         try {
             if (jFile.isDocumentFile()) {

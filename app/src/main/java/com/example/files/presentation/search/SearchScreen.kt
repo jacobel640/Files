@@ -67,6 +67,9 @@ import com.example.files.models.JFile
 import com.example.files.viewmodels.SearchViewModel
 import java.util.Calendar
 
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class SearchScreen() : Fragment() {
 
     var category: String = ""
@@ -85,14 +88,7 @@ class SearchScreen() : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val repository = FileRepository(requireContext())
-                @Suppress("UNCHECKED_CAST")
-                return SearchViewModel(repository) as T
-            }
-        }
-        searchViewModel = ViewModelProvider(this, factory)[SearchViewModel::class.java]
+        searchViewModel = ViewModelProvider(this)[SearchViewModel::class.java]
         searchViewModel.loadFiles(category, jFiles, Statics.folder?.path)
     }
 

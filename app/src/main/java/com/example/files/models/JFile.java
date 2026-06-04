@@ -5,6 +5,7 @@ import static com.example.files.Statics.showFileSize;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -39,7 +40,7 @@ public class JFile extends File implements Comparable<File> {
     public enum Type {FOLDER, IMAGE, VIDEO, AUDIO, APK, ARCHIVE, DOCUMENT, SHORTCUT, OTHER}
 
     public String id;
-    Activity activity;
+    Context context;
     CharSequence info = "";
     String path;
     boolean selected;
@@ -54,27 +55,27 @@ public class JFile extends File implements Comparable<File> {
     private volatile Object cachedIcon;
     private volatile boolean iconLoading;
 
-    public JFile(String path, Activity activity) {
+    public JFile(String path, Context context) {
         super(path);
-        this.activity = activity;
+        this.context = context;
         this.type = FileIcon.types(getExtension().toLowerCase(), isDirectory());
     }
 
-    public JFile(String id, String path, Activity activity) {
+    public JFile(String id, String path, Context context) {
         super(path);
         this.id = id;
-        this.activity = activity;
+        this.context = context;
         this.type = FileIcon.types(getExtension().toLowerCase(), isDirectory());
     }
 
-    public JFile(File file, Activity activity) {
+    public JFile(File file, Context context) {
         super(file.getPath());
-        this.activity = activity;
+        this.context = context;
         this.type = FileIcon.types(getExtension().toLowerCase(), isDirectory());
     }
 
-    public Activity getActivity() {
-        return activity;
+    public Context getContext() {
+        return context;
     }
 
     public JFile(@NonNull String pathname) {
@@ -94,23 +95,23 @@ public class JFile extends File implements Comparable<File> {
     }
 
     public DocumentFile getDocumentFileOrig() {
-        Uri uri = FileProvider.getUriForFile(activity, "com.example.files", this);
-        return DocumentFile.fromSingleUri(activity, uri);
+        Uri uri = FileProvider.getUriForFile(context, "com.example.files", this);
+        return DocumentFile.fromSingleUri(context, uri);
     }
 
     public DocumentFile getDocumentFile() {
-        String uri = new PathFormatter(activity).externalFilePathWoName(FileProvider.getUriForFile(activity, "com.example.files", this).toString());
-        return DocumentFile.fromSingleUri(activity, Uri.parse(uri));
+        String uri = new PathFormatter(context).externalFilePathWoName(FileProvider.getUriForFile(context, "com.example.files", this).toString());
+        return DocumentFile.fromSingleUri(context, Uri.parse(uri));
     }
 
     public DocumentFile getDocumentTree() {
-        String uri = new PathFormatter(activity).externalFilePathWoName(FileProvider.getUriForFile(activity, "com.example.files", this).toString());
-        return DocumentFile.fromTreeUri(activity, Uri.parse(uri));
+        String uri = new PathFormatter(context).externalFilePathWoName(FileProvider.getUriForFile(context, "com.example.files", this).toString());
+        return DocumentFile.fromTreeUri(context, Uri.parse(uri));
     }
 
     public DocumentFile getDocumentTreeSec() {
-        Uri uri = Uri.parse(new PathFormatter(activity).externalFolderPathWoName(this.getPath()));
-        return DocumentFile.fromTreeUri(activity, uri);
+        Uri uri = Uri.parse(new PathFormatter(context).externalFolderPathWoName(this.getPath()));
+        return DocumentFile.fromTreeUri(context, uri);
     }
 
     public Uri getUri() {
@@ -135,7 +136,7 @@ public class JFile extends File implements Comparable<File> {
         if (files != null) {
             JFile[] jFiles = new JFile[files.length];
             for (int i = 0; i < files.length; i++) {
-                jFiles[i] = new JFile(files[i], activity);
+                jFiles[i] = new JFile(files[i], context);
             }
             return jFiles;
         } else return null;
@@ -157,21 +158,21 @@ public class JFile extends File implements Comparable<File> {
         if (isDirectory()) {
             if (showFileSize) {
                 if (isSizeReady()) {
-                    return Formatter.formatFileSize(activity, getSize());
+                    return Formatter.formatFileSize(context, getSize());
                 } else {
                     loadSizeIfNeeded();
-                    return activity.getString(R.string.loading);
+                    return context.getString(R.string.loading);
                 }
             }
             return getCountItems();
-        } else return Formatter.formatFileSize(activity, getSize());
+        } else return Formatter.formatFileSize(context, getSize());
     }
 
     public String getCountItems() { //TODO create method to return count of items in folder more faster
         if (isDirectory()) {
             if (count == 0) this.count = countFiles();
-            return activity.getString(R.string.items, String.valueOf(count));
-        } else return Formatter.formatFileSize(activity, length());
+            return context.getString(R.string.items, String.valueOf(count));
+        } else return Formatter.formatFileSize(context, length());
     }
 
     public int countFiles() {
@@ -298,13 +299,13 @@ public class JFile extends File implements Comparable<File> {
                 return R.drawable.ctg_audio;
             case "apk":
                 try {
-                    PackageInfo packageInfo = activity.getPackageManager().getPackageArchiveInfo(getPath(), PackageManager.GET_ACTIVITIES);
+                    PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(getPath(), PackageManager.GET_ACTIVITIES);
                     if (packageInfo != null) {
                         ApplicationInfo appInfo = packageInfo.applicationInfo;
                         assert appInfo != null;
                         appInfo.sourceDir = getPath();
                         appInfo.publicSourceDir = getPath();
-                        return appInfo.loadIcon(activity.getPackageManager());
+                        return appInfo.loadIcon(context.getPackageManager());
                     }
                 } catch (Exception ignored) {
                 }

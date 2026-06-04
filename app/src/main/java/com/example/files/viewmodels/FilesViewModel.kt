@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.ArrayList
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class FilesUiState(
     val isLoading: Boolean = false,
@@ -23,7 +25,8 @@ data class FilesUiState(
     val error: String? = null
 )
 
-class FilesViewModel : ViewModel() {
+@HiltViewModel
+class FilesViewModel @Inject constructor() : ViewModel() {
 
     var isDragging = false
     var lastDragEndTime = 0L
@@ -44,7 +47,7 @@ class FilesViewModel : ViewModel() {
             Statics.folder?.listFiles()?.let { array ->
                 for (file in array) {
                     if (!com.example.files.Statics.showHiddenFiles && file.name.startsWith(".")) continue
-                    filesList.add(JFile(file, context as android.app.Activity))
+                    filesList.add(JFile(file, context))
                 }
             }
             com.example.files.actions.DialogSort.sort(filesList)

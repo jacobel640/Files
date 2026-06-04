@@ -109,6 +109,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class FilesFragment : FragmentBase(FragmentType.FILES) {
     private lateinit var filesViewModel: FilesViewModel
 

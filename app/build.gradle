@@ -2,8 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.compose'
-    // id 'kotlin-kapt'
-    // id 'com.google.dagger.hilt.android'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 // apply plugin: 'com.jakewharton.butterknife'
@@ -91,6 +91,12 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling'
     implementation 'androidx.activity:activity-compose:1.13.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0'
+
+    implementation "com.google.dagger:hilt-android:2.57.2"
+    kapt "com.google.dagger:hilt-compiler:2.57.2"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
+
+    testImplementation 'junit:junit:4.13.2'
     implementation 'androidx.documentfile:documentfile:1.1.0'
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.10") {

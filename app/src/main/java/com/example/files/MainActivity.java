@@ -104,6 +104,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends BaseActivity {
 
     boolean activityCreated;

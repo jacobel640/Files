@@ -9,7 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class FileRepository(private val context: Context) {
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+
+class FileRepository @Inject constructor(@ApplicationContext private val context: Context) {
 
     suspend fun queryMediaStore(uri: Uri, isRecent: Boolean = false): List<JFile> = withContext(Dispatchers.IO) {
         val result = mutableListOf<JFile>()
@@ -27,11 +30,11 @@ class FileRepository(private val context: Context) {
                         val file = File(data)
                         if (isRecent) {
                             if (filterRecent(file)) {
-                                result.add(JFile(file, context as android.app.Activity))
+                                result.add(JFile(file, context))
                                 count++
                             }
                         } else {
-                            result.add(JFile(file, context as android.app.Activity))
+                            result.add(JFile(file, context))
                         }
                     }
                 } while (it.moveToPrevious() && (!isRecent || count <= 300))
@@ -60,7 +63,7 @@ class FileRepository(private val context: Context) {
                 if (file.isDirectory) {
                     result.addAll(iterateFolder(file))
                 }
-                result.add(JFile(file, context as android.app.Activity))
+                result.add(JFile(file, context))
             }
         }
         result
