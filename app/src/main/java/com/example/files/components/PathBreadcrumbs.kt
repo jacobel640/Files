@@ -15,6 +15,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -123,9 +125,13 @@ fun PathBreadcrumbs(
                             )
                         }
                         
+                        val configuration = LocalConfiguration.current
+                        val maxDropdownHeight = (configuration.screenHeightDp / 2).dp
+                        
                         DropdownMenu(
                             expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false }
+                            onDismissRequest = { menuExpanded = false },
+                            modifier = Modifier.heightIn(max = maxDropdownHeight)
                         ) {
                             var subDirs by remember { mutableStateOf<List<File>?>(null) }
                             
