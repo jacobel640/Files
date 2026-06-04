@@ -425,10 +425,6 @@ fun FilesScreen(
             } else {
                 val gridState = rememberLazyGridState()
                 Box(modifier = Modifier.fillMaxSize()) {
-                    val density = LocalDensity.current
-                    val topPaddingPx = with(density) { (paddingValues.calculateTopPadding() + if (uiState.isGridView) 8.dp else 0.dp).toPx() }
-                    val startPaddingPx = with(density) { (if (uiState.isGridView) 8.dp else 0.dp).toPx() }
-
                     LazyVerticalGrid(
                     state = gridState,
                     columns = if (uiState.isGridView) GridCells.Fixed(4) else GridCells.Fixed(1),
@@ -444,8 +440,6 @@ fun FilesScreen(
                         .fillMaxSize()
                         .dragToSelectGrid(
                             state = gridState,
-                            topPaddingPx = topPaddingPx,
-                            startPaddingPx = startPaddingPx,
                             onDragStart = { start ->
                                 viewModel.isDragging = true
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -567,8 +561,6 @@ fun FilesScreen(
 @OptIn(DelicateCoroutinesApi::class)
 fun Modifier.dragToSelectGrid(
     state: LazyGridState,
-    topPaddingPx: Float,
-    startPaddingPx: Float,
     onDragStart: (Int) -> Unit,
     onDragFinished: () -> Unit,
     onSelectRange: (Int, Int) -> Unit
@@ -581,10 +573,8 @@ fun Modifier.dragToSelectGrid(
         onDragStart = { offset ->
             if (Statics.copyMode) return@detectDragGesturesAfterLongPress
             val item = state.layoutInfo.visibleItemsInfo.find {
-                val startY = it.offset.y + topPaddingPx
-                val startX = it.offset.x + startPaddingPx
-                offset.x >= startX && offset.x <= startX + it.size.width &&
-                offset.y >= startY && offset.y <= startY + it.size.height
+                offset.x >= it.offset.x && offset.x <= it.offset.x + it.size.width &&
+                offset.y >= it.offset.y && offset.y <= it.offset.y + it.size.height
             }
             initialIndex = item?.index
             initialIndex?.let { initIndext ->
@@ -610,10 +600,8 @@ fun Modifier.dragToSelectGrid(
                             if (scrollSpeed != 0f) {
                                 state.scrollBy(scrollSpeed)
                                 val currentItem = state.layoutInfo.visibleItemsInfo.find {
-                                    val startY = it.offset.y + topPaddingPx
-                                    val startX = it.offset.x + startPaddingPx
-                                    pos.x >= startX && pos.x <= startX + it.size.width &&
-                                    pos.y >= startY && pos.y <= startY + it.size.height
+                                    pos.x >= it.offset.x && pos.x <= it.offset.x + it.size.width &&
+                                    pos.y >= it.offset.y && pos.y <= it.offset.y + it.size.height
                                 }
                                 currentItem?.index?.let { currentIdx ->
                                     onSelectRange(initialIndex!!, currentIdx)
@@ -629,10 +617,8 @@ fun Modifier.dragToSelectGrid(
             if (initialIndex == null) return@detectDragGesturesAfterLongPress
             currentPointerPosition = change.position
             val item = state.layoutInfo.visibleItemsInfo.find {
-                val startY = it.offset.y + topPaddingPx
-                val startX = it.offset.x + startPaddingPx
-                change.position.x >= startX && change.position.x <= startX + it.size.width &&
-                change.position.y >= startY && change.position.y <= startY + it.size.height
+                change.position.x >= it.offset.x && change.position.x <= it.offset.x + it.size.width &&
+                change.position.y >= it.offset.y && change.position.y <= it.offset.y + it.size.height
             }
             item?.index?.let { current ->
                 onSelectRange(initialIndex!!, current)
