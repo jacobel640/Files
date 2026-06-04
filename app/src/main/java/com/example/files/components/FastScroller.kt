@@ -93,36 +93,42 @@ fun FastScroller(
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .width(48.dp)
             .onGloballyPositioned { coordinates ->
                 containerHeight = coordinates.size.height.toFloat()
             }
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { 
-                        isDragging = true
-                        // Calculate an initial dragY based on current scroll position
-                        val thumbHeightPx = thumbHeight.toPx()
-                        val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
-                        dragY = (maxOffset * proportion).coerceIn(0f, maxOffset)
-                    },
-                    onDragEnd = { isDragging = false },
-                    onDragCancel = { isDragging = false },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        val thumbHeightPx = thumbHeight.toPx()
-                        val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
-                        dragY += dragAmount.y
-                        val clampedY = dragY.coerceIn(0f, maxOffset)
-                        val targetProportion = if (maxOffset > 0) clampedY / maxOffset else 0f
-                        val targetIndex = (targetProportion * totalItemsCount).toInt().coerceIn(0, totalItemsCount - 1)
-                        coroutineScope.launch {
-                            gridState.scrollToItem(targetIndex)
-                        }
-                    }
-                )
-            }
     ) {
+        // Restrict drag area to exactly where the thumb is placed
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .fillMaxHeight()
+                .width(48.dp)
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { 
+                            isDragging = true
+                            val thumbHeightPx = thumbHeight.toPx()
+                            val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
+                            dragY = (maxOffset * proportion).coerceIn(0f, maxOffset)
+                        },
+                        onDragEnd = { isDragging = false },
+                        onDragCancel = { isDragging = false },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            val thumbHeightPx = thumbHeight.toPx()
+                            val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
+                            dragY += dragAmount.y
+                            val clampedY = dragY.coerceIn(0f, maxOffset)
+                            val targetProportion = if (maxOffset > 0) clampedY / maxOffset else 0f
+                            val targetIndex = (targetProportion * totalItemsCount).toInt().coerceIn(0, totalItemsCount - 1)
+                            coroutineScope.launch {
+                                gridState.scrollToItem(targetIndex)
+                            }
+                        }
+                    )
+                }
+        )
+
         val thumbHeightPx = with(context.resources.displayMetrics) { thumbHeight.value * density }
         val maxOffset = (containerHeight - thumbHeightPx).coerceAtLeast(0f)
         val yOffset = (maxOffset * proportion).coerceIn(0f, maxOffset)
@@ -130,7 +136,7 @@ fun FastScroller(
         if (thumbAlpha > 0f) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .align(Alignment.TopEnd)
                     .offset { IntOffset(0, yOffset.roundToInt()) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End

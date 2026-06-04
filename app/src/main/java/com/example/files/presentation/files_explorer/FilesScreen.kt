@@ -63,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -228,8 +229,22 @@ fun FilesScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Column {
+            Column(
+                modifier = Modifier.background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.surface,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.0f)
+                        )
+                    )
+                )
+            ) {
                 LargeTopAppBar(
+                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent
+                    ),
                     title = {
                         Row(
                             modifier = Modifier.clickable(
@@ -395,7 +410,6 @@ fun FilesScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             if (uiState.isLoading && uiState.files.isEmpty()) {
@@ -413,7 +427,12 @@ fun FilesScreen(
                     LazyVerticalGrid(
                     state = gridState,
                     columns = if (uiState.isGridView) GridCells.Fixed(4) else GridCells.Fixed(1),
-                    contentPadding = if (uiState.isGridView) PaddingValues(8.dp) else PaddingValues(0.dp),
+                    contentPadding = PaddingValues(
+                        start = if (uiState.isGridView) 8.dp else 0.dp,
+                        end = if (uiState.isGridView) 8.dp else 0.dp,
+                        top = paddingValues.calculateTopPadding() + if (uiState.isGridView) 8.dp else 0.dp,
+                        bottom = paddingValues.calculateBottomPadding() + 80.dp + if (uiState.isGridView) 8.dp else 0.dp
+                    ),
                     horizontalArrangement = if (uiState.isGridView) Arrangement.spacedBy(4.dp) else Arrangement.Start,
                     verticalArrangement = if (uiState.isGridView) Arrangement.spacedBy(4.dp) else Arrangement.Top,
                     modifier = Modifier
@@ -524,7 +543,12 @@ fun FilesScreen(
                     FastScroller(
                         gridState = gridState,
                         items = uiState.files,
-                        modifier = Modifier.align(Alignment.TopEnd),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(
+                                top = paddingValues.calculateTopPadding(),
+                                bottom = paddingValues.calculateBottomPadding() + 80.dp
+                            ),
                         sortMode = currentSort
                     )
             }
