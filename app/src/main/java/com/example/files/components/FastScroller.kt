@@ -174,7 +174,7 @@ fun FastScroller(
                     Box(
                         modifier = Modifier
                             .alpha(popupAlpha)
-                            .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp, topEnd = 0.dp, bottomEnd = 16.dp))
+                            .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp, topEnd = 5.dp, bottomEnd = 5.dp))
                             .background(MaterialTheme.colorScheme.primary)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {

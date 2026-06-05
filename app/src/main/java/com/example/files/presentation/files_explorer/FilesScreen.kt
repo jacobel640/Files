@@ -193,10 +193,38 @@ fun FilesScreen(
         val full = PathFormatter(context).format(uiState.currentPath)
         full.split("/").lastOrNull() ?: uiState.currentPathName
     }
+    val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 
     // Trigger load when screen starts or path changes
     LaunchedEffect(Unit) {
         viewModel.refreshList(context)
+    }
+
+    // Dynamically resort if sorting by size and items are loading their size
+    LaunchedEffect(uiState.files, Statics.sort) {
+        if (Statics.sort == 1 && Statics.showFileSize) {
+            uiState.files.forEach { it.loadSizeIfNeeded() }
+            while (true) {
+                if (!uiState.files.any { it.isSizeLoading }) {
+                    val oldFiles = uiState.files
+                    val filesList = java.util.ArrayList(oldFiles)
+                    com.example.files.actions.DialogSort.sort(filesList)
+                    if (oldFiles != filesList) {
+                        val index = gridState.firstVisibleItemIndex
+                        val offset = gridState.firstVisibleItemScrollOffset
+                        viewModel.resortIfSize()
+                        gridState.requestScrollToItem(index, offset)
+                    }
+                    break
+                }
+
+                kotlinx.coroutines.delay(1000)
+                val index = gridState.firstVisibleItemIndex
+                val offset = gridState.firstVisibleItemScrollOffset
+                viewModel.resortIfSize()
+                gridState.requestScrollToItem(index, offset)
+            }
+        }
     }
 
     BackHandler(enabled = uiState.selectedFiles.isNotEmpty()) {
@@ -410,7 +438,7 @@ fun FilesScreen(
                             onNavigateToFolder(JFile(File(path), context as Activity))
                         },
                         onHomeClick = {
-                            (context as? Activity)?.finish()
+                            MainActivity.closeAllFragments()
                         }
                     )
                 }
@@ -432,7 +460,6 @@ fun FilesScreen(
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
-                val gridState = rememberLazyGridState()
                 Box(modifier = Modifier.fillMaxSize()) {
                     val density = LocalDensity.current
                     val topPaddingPx = with(density) { (paddingValues.calculateTopPadding() + if (uiState.isGridView) 8.dp else 0.dp).toPx() }
@@ -496,7 +523,8 @@ fun FilesScreen(
                                 onLongClick = {
                                     viewModel.toggleSelection(file)
                                 },
-                                iconContent = iconContent
+                                iconContent = iconContent,
+                                modifier = Modifier.animateItem()
                             )
                         } else {
                             val dismissState = rememberSwipeToDismissBoxState(
@@ -511,6 +539,7 @@ fun FilesScreen(
                             )
 
                             SwipeToDismissBox(
+                                modifier = Modifier.animateItem(),
                                 state = dismissState,
                                 enableDismissFromEndToStart = false,
                                 enableDismissFromStartToEnd = true,

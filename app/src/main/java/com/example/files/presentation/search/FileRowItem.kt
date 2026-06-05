@@ -66,7 +66,7 @@ fun FileRowItem(file: JFile) {
                     text = file.name,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
+                    maxLines = if (Statics.isSingleLine) 1 else Int.MAX_VALUE,
                     overflow = TextOverflow.Ellipsis
                 )
                 Row(

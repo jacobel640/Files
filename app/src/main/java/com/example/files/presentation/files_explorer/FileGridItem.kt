@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.files.models.JFile
+import com.example.files.Statics
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,12 +36,13 @@ fun FileGridItem(
     isSelected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    iconContent: @Composable () -> Unit
+    iconContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.Companion
+        modifier = modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .defaultMinSize(minHeight = 100.dp)
             .clip(RoundedCornerShape(15.dp))
             .background(
                 color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
@@ -77,9 +80,15 @@ fun FileGridItem(
             text = file.name,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 2,
+            maxLines = if (Statics.isSingleLine) 1 else 3,
             overflow = TextOverflow.Companion.Ellipsis,
             textAlign = TextAlign.Companion.Center
         )
+        if (Statics.showFileSize) {
+            com.example.files.components.FileSizeLabel(
+                file = file,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

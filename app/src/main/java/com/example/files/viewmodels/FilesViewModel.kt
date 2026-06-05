@@ -144,4 +144,12 @@ class FilesViewModel @Inject constructor() : ViewModel() {
         }
         updateSelection(selected)
     }
+
+    fun resortIfSize() {
+        if (com.example.files.Statics.sort == 1) {
+            val filesList = ArrayList(_uiState.value.files)
+            com.example.files.actions.DialogSort.sort(filesList)
+            _uiState.value = _uiState.value.copy(files = filesList)
+        }
+    }
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.files.models.JFile
+import com.example.files.Statics
 
 val ColorScheme.selectedItemColor: Color
     @Composable
@@ -43,10 +44,11 @@ fun FileRowItem(
     isSelected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    iconContent: @Composable () -> Unit
+    iconContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.background(
+        modifier = modifier.background(
             if (isSelected) MaterialTheme.colorScheme.selectedItemColor
             else MaterialTheme.colorScheme.surface
         )
@@ -77,15 +79,15 @@ fun FileRowItem(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = file.name,
                     fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
+                    maxLines = if (Statics.isSingleLine) 1 else Int.MAX_VALUE,
                     overflow = TextOverflow.Ellipsis
                 )
                 Row(
@@ -98,10 +100,8 @@ fun FileRowItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(3f)
                     )
-                    Text(
-                        text = file.stringSize ?: "",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    com.example.files.components.FileSizeLabel(
+                        file = file,
                         modifier = Modifier.weight(2f),
                         textAlign = TextAlign.End
                     )

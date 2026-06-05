@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -28,7 +30,14 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.example.files.R
+import com.example.files.components.custom_icons.CtgArchive
+import com.example.files.components.custom_icons.CtgAudio
+import com.example.files.components.custom_icons.CtgPhoto
+import com.example.files.components.custom_icons.CtgVideo
+import com.example.files.components.custom_icons.ExtFolder
+import com.example.files.components.custom_icons.ExtApk
+import com.example.files.components.custom_icons.ExtTypeOffice
+import com.example.files.components.custom_icons.ExtUnknownFile
 import com.example.files.models.JFile
 import com.example.files.utils.FileIcon
 import kotlinx.coroutines.Dispatchers
@@ -51,17 +60,15 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
         }
     }
 
-    val typeResourceId = remember(file.type) { 
-        when (file.type) {
-            JFile.Type.FOLDER -> R.drawable.folder
-            JFile.Type.AUDIO -> R.drawable.ctg_audio
-            JFile.Type.IMAGE -> R.drawable.ctg_photo
-            JFile.Type.VIDEO -> R.drawable.ctg_video
-            JFile.Type.APK -> R.drawable.ext_apk
-            JFile.Type.ARCHIVE -> R.drawable.ctg_archive
-            JFile.Type.DOCUMENT -> R.drawable.type_office
-            else -> R.drawable.file
-        }
+    val typeImageVector = when (file.type) {
+        JFile.Type.FOLDER -> Icons.Rounded.ExtFolder
+        JFile.Type.AUDIO -> Icons.Rounded.CtgAudio
+        JFile.Type.IMAGE -> Icons.Rounded.CtgPhoto
+        JFile.Type.VIDEO -> Icons.Rounded.CtgVideo
+        JFile.Type.APK -> Icons.Rounded.ExtApk
+        JFile.Type.ARCHIVE -> Icons.Rounded.CtgArchive
+        JFile.Type.DOCUMENT -> Icons.Rounded.ExtTypeOffice
+        else -> Icons.Rounded.ExtUnknownFile
     }
     val isImageType = remember(file.type) { FileIcon.isImageType(file.type) }
     
@@ -108,7 +115,7 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                 },
                 loading = placeholder {
                     Image(
-                        painter = painterResource(id = typeResourceId),
+                        imageVector = typeImageVector,
                         contentDescription = null,
                         modifier = Modifier.matchParentSize().padding(if (isImageType) 5.dp else 0.dp),
                         contentScale = ContentScale.Fit
@@ -116,7 +123,7 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                 },
                 failure = placeholder {
                     Image(
-                        painter = painterResource(id = typeResourceId),
+                        imageVector = typeImageVector,
                         contentDescription = null,
                         modifier = Modifier.matchParentSize().padding(if (isImageType) 5.dp else 0.dp),
                         contentScale = ContentScale.Fit
@@ -126,7 +133,7 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
         } else {
             // Fallback placeholder while loading or if it is just a drawable/int
             Image(
-                painter = painterResource(id = typeResourceId),
+                imageVector = typeImageVector,
                 contentDescription = null,
                 modifier = Modifier.matchParentSize().padding(5.dp),
                 contentScale = ContentScale.Fit
@@ -150,7 +157,7 @@ fun FileIcon(file: JFile, modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.BottomEnd
             ) {
                 Image(
-                    painter = painterResource(id = typeResourceId),
+                    imageVector = typeImageVector,
                     contentDescription = "Type Indicator",
                     modifier = Modifier.size(12.dp)
                 )

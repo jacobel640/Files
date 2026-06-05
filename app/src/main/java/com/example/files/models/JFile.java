@@ -38,6 +38,15 @@ import java.util.Locale;
 
 public class JFile extends File implements Comparable<File> {
     public enum Type {FOLDER, IMAGE, VIDEO, AUDIO, APK, ARCHIVE, DOCUMENT, SHORTCUT, OTHER}
+    public static class CachedSize {
+        public long size;
+        public long lastModified;
+        public CachedSize(long size, long lastModified) {
+            this.size = size;
+            this.lastModified = lastModified;
+        }
+    }
+    public static final java.util.concurrent.ConcurrentHashMap<String, CachedSize> sizeCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     public String id;
     Context context;
@@ -59,6 +68,13 @@ public class JFile extends File implements Comparable<File> {
         super(path);
         this.context = context;
         this.type = FileIcon.types(getExtension().toLowerCase(), isDirectory());
+        if (sizeCache.containsKey(getPath())) {
+            CachedSize cached = sizeCache.get(getPath());
+            if (cached != null && cached.lastModified == lastModified()) {
+                this.size = cached.size;
+                this.lastChecked = cached.lastModified;
+            }
+        }
     }
 
     public JFile(String id, String path, Context context) {
@@ -66,12 +82,26 @@ public class JFile extends File implements Comparable<File> {
         this.id = id;
         this.context = context;
         this.type = FileIcon.types(getExtension().toLowerCase(), isDirectory());
+        if (sizeCache.containsKey(getPath())) {
+            CachedSize cached = sizeCache.get(getPath());
+            if (cached != null && cached.lastModified == lastModified()) {
+                this.size = cached.size;
+                this.lastChecked = cached.lastModified;
+            }
+        }
     }
 
     public JFile(File file, Context context) {
         super(file.getPath());
         this.context = context;
         this.type = FileIcon.types(getExtension().toLowerCase(), isDirectory());
+        if (sizeCache.containsKey(getPath())) {
+            CachedSize cached = sizeCache.get(getPath());
+            if (cached != null && cached.lastModified == lastModified()) {
+                this.size = cached.size;
+                this.lastChecked = cached.lastModified;
+            }
+        }
     }
 
     public Context getContext() {
@@ -208,10 +238,14 @@ public class JFile extends File implements Comparable<File> {
         sizeLoading = true;
 
         JFileExecutor.execute(() -> {
-            long result = calculateFolderSize(this);
+            long[] runningTotal = new long[]{0};
+            long[] lastUpdate = new long[]{System.currentTimeMillis()};
+            calculateFolderSize(this, runningTotal, lastUpdate);
+            long result = runningTotal[0];
 
             size = result;
-            lastChecked = System.currentTimeMillis();
+            lastChecked = lastModified();
+            sizeCache.put(getPath(), new CachedSize(result, lastChecked));
             sizeLoading = false;
 
             if (sizeLoadListener != null) {
@@ -220,20 +254,28 @@ public class JFile extends File implements Comparable<File> {
         });
     }
 
-    private long calculateFolderSize(File dir) {
-        long total = 0;
-
+    private void calculateFolderSize(File dir, long[] runningTotal, long[] lastUpdate) {
         File[] files = dir.listFiles();
-        if (files == null) return 0;
+        if (files == null) return;
 
         for (File f : files) {
             if (f.isDirectory()) {
-                total += calculateFolderSize(f);
+                calculateFolderSize(f, runningTotal, lastUpdate);
             } else {
-                total += f.length();
+                runningTotal[0] += f.length();
+                if (System.currentTimeMillis() - lastUpdate[0] > 100) {
+                    this.size = runningTotal[0];
+                    if (sizeLoadListener != null) {
+                        sizeLoadListener.onSizeUpdate(runningTotal[0]);
+                    }
+                    lastUpdate[0] = System.currentTimeMillis();
+                }
             }
         }
-        return total;
+    }
+
+    public boolean isSizeLoading() {
+        return sizeLoading;
     }
 
     public void setSizeLoadListener(OnSizeLoadReady sizeLoadListener) {
