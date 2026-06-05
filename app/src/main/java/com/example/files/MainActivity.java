@@ -32,7 +32,7 @@ import static com.example.files.Statics.startCurrentAction;
 import static com.example.files.Statics.tempFolder;
 import static com.example.files.utils.Animations.hide;
 import static com.example.files.utils.Animations.show;
-import static com.example.files.fragments.ZippedFragment.delete;
+import static com.example.files.utils.Animations.show;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -90,11 +90,7 @@ import com.example.files.actions.Share;
 import com.example.files.activities.SettingsActivity;
 import com.example.files.activities.StorageAnalyzer;
 import com.example.files.presentation.files_explorer.FilesFragment;
-import com.example.files.fragments.FilesFragmentCategory;
-import com.example.files.fragments.FragmentBase;
-import com.example.files.fragments.RecentFragment;
 import com.example.files.presentation.search.SearchScreen;
-import com.example.files.fragments.ZippedFragment;
 import com.example.files.listeners.OnMultiSelectedChange;
 import com.example.files.models.JFile;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -339,7 +335,7 @@ public class MainActivity extends BaseActivity {
 
     public Fragment newZippedFragment(File file) {
         folder = file;
-        return currentFragment = new ZippedFragment();
+        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("ZIPPED", null, file.getPath());
     }
 
     public Fragment newSFragment(String category, ArrayList<JFile> jFiles) {
@@ -348,10 +344,10 @@ public class MainActivity extends BaseActivity {
     }
 
     public Fragment newDFragment(String category) {
-        return currentFragment = new FilesFragmentCategory(category);
+        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("CATEGORY", category, null);
     }
     public Fragment newRFragment() {
-        return currentFragment = new RecentFragment();
+        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("RECENT", null, null);
     }
 
     public void loadFragment(Fragment fragment, String tag) {
@@ -527,7 +523,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public static boolean enableTextButton() {
-        if (!currentFragment.isType(FragmentBase.FragmentType.FILES)) return false;
+        if (!currentFragment.isTypeFiles()) return false;
         Log.d("##### MainActivity.enableTextButton #####",
                 "\n!currentFragment.notVisible() = " + !currentFragment.notVisible() +
                 "\ncurrentFragment.isFilesType() = " + currentFragment.isFilesType() + "\ncopyMode = " + copyMode);
@@ -572,8 +568,17 @@ public class MainActivity extends BaseActivity {
     }
 
     public static void cleanCache(Activity activity) {
-        for (File file : Objects.requireNonNull(new File(Objects.requireNonNull(activity.getExternalFilesDir("temp")).getPath()).listFiles())) delete(file);
-        for (File file : Objects.requireNonNull(new File(Objects.requireNonNull(activity.getExternalFilesDir("zips")).getPath()).listFiles())) delete(file);
+        for (File file : Objects.requireNonNull(new File(Objects.requireNonNull(activity.getExternalFilesDir("temp")).getPath()).listFiles())) deleteFile(file);
+        for (File file : Objects.requireNonNull(new File(Objects.requireNonNull(activity.getExternalFilesDir("zips")).getPath()).listFiles())) deleteFile(file);
+    }
+    
+    private static void deleteFile(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteFile(child);
+            }
+        }
+        fileOrDirectory.delete();
     }
 
     public boolean fragmentInLayout(){

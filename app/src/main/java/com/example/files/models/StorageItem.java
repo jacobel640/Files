@@ -23,7 +23,7 @@ import com.example.files.JFileAdapter;
 import com.example.files.R;
 import com.example.files.utils.FileIcon;
 import com.example.files.utils.PathFormatter;
-import com.example.files.fragments.FavoritesFragment;
+import com.example.files.presentation.files_explorer.FilesFragment;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.io.File;
@@ -89,7 +89,7 @@ public class StorageItem extends LinearLayout {
         });
         if (isShortcut)
             findViewById(R.id.item).setOnLongClickListener(v -> {
-                instance.loadFragment(new FavoritesFragment(file.getPath()), "favorites");
+                instance.loadFragment(FilesFragment.newInstance("FAVORITES", null, null), "favorites");
                 return true;
             });
     }

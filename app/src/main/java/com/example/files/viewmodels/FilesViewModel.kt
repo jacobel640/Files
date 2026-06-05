@@ -22,8 +22,17 @@ data class FilesUiState(
     val selectedFiles: List<JFile> = emptyList(),
     val isGridView: Boolean = false,
     val isAllSelectedFavorites: Boolean = false,
+    val mode: FilesMode = FilesMode.Normal,
     val error: String? = null
 )
+
+sealed class FilesMode {
+    object Normal : FilesMode()
+    object Recent : FilesMode()
+    object Favorites : FilesMode()
+    data class Category(val name: String) : FilesMode()
+    data class Zipped(val file: java.io.File) : FilesMode()
+}
 
 @HiltViewModel
 class FilesViewModel @Inject constructor() : ViewModel() {
@@ -36,30 +45,126 @@ class FilesViewModel @Inject constructor() : ViewModel() {
     ))
     val uiState: StateFlow<FilesUiState> = _uiState.asStateFlow()
 
-    fun refreshList(context: Context) {
+    fun refreshList(context: Context, mode: FilesMode = _uiState.value.mode) {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            // Just sync with Statics for now to mimic legacy behavior
-            val filesList = ArrayList<JFile>() 
-            val currentPath = Statics.folder?.path ?: ""
-            val currentPathName = Statics.folder?.name ?: ""
-            
-            Statics.folder?.listFiles()?.let { array ->
-                for (file in array) {
-                    if (!com.example.files.Statics.showHiddenFiles && file.name.startsWith(".")) continue
-                    filesList.add(JFile(file, context))
+            _uiState.value = _uiState.value.copy(isLoading = true, mode = mode)
+            try {
+                var newFiles: List<JFile> = emptyList()
+                when (mode) {
+                    is FilesMode.Recent -> {
+                        newFiles = refreshRecents(context)
+                        _uiState.value = _uiState.value.copy(currentPathName = context.getString(com.example.files.R.string.recent_files))
+                    }
+                    is FilesMode.Favorites -> {
+                        newFiles = refreshFavorites(context)
+                        _uiState.value = _uiState.value.copy(currentPathName = context.getString(com.example.files.R.string.favorites))
+                    }
+                    is FilesMode.Category -> {
+                        newFiles = getSFiles(context, mode.name)
+                        _uiState.value = _uiState.value.copy(currentPathName = mode.name)
+                    }
+                    is FilesMode.Zipped -> {
+                        newFiles = getJFiles(context, getFilesList(mode.file))
+                        _uiState.value = _uiState.value.copy(currentPathName = mode.file.name)
+                    }
+                    is FilesMode.Normal -> {
+                        if (Statics.folder != null) {
+                            newFiles = getJFiles(context, getFilesList(Statics.folder))
+                            _uiState.value = _uiState.value.copy(
+                                currentPath = Statics.folder.path,
+                                currentPathName = Statics.folder.name
+                            )
+                        }
+                    }
+                }
+                
+                val filesList = ArrayList(newFiles)
+                com.example.files.actions.DialogSort.sort(filesList)
+                
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    isGridView = Statics.FOLDER_VIEW_TYPE == com.example.files.JFileAdapter.ViewType.GRID,
+                    files = filesList
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message
+                )
+            }
+        }
+    }
+
+    private fun refreshRecents(context: Context): List<JFile> {
+        val recent = mutableListOf<JFile>()
+        val sortOrder = android.provider.MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC"
+        val uri = android.provider.MediaStore.Files.getContentUri("external")
+        val projection = arrayOf(android.provider.MediaStore.Files.FileColumns.DATA)
+        context.contentResolver.query(uri, projection, null, null, sortOrder)?.use { cursor ->
+            val dataCol = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Files.FileColumns.DATA)
+            var count = 0
+            while (cursor.moveToNext() && count < 2000) {
+                val path = cursor.getString(dataCol)
+                val jFile = JFile(path, context)
+                if (!jFile.isDirectory && !jFile.isHidden) {
+                    recent.add(jFile)
+                    count++
                 }
             }
-            com.example.files.actions.DialogSort.sort(filesList)
-            
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                currentPath = currentPath,
-                currentPathName = currentPathName,
-                isGridView = Statics.FOLDER_VIEW_TYPE == com.example.files.JFileAdapter.ViewType.GRID,
-                files = filesList
-            )
         }
+        return recent
+    }
+
+    private fun refreshFavorites(context: Context): List<JFile> {
+        val favsDb = com.example.files.database.DBHelper(context)
+        return favsDb.allPaths.map { JFile(it, context) }
+    }
+
+    private fun getSFiles(context: Context, categoryName: String): List<JFile> {
+        val files = mutableListOf<JFile>()
+        val uri = android.provider.MediaStore.Files.getContentUri("external")
+        val projection = arrayOf(android.provider.MediaStore.Files.FileColumns.DATA)
+        var selection: String? = null
+        var selectionArgs: Array<String>? = null
+        
+        when (categoryName) {
+            context.getString(com.example.files.R.string.pictures) -> {
+                selection = android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+            }
+            context.getString(com.example.files.R.string.video) -> {
+                selection = android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
+            }
+            context.getString(com.example.files.R.string.audio) -> {
+                selection = android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO
+            }
+            context.getString(com.example.files.R.string.documents) -> {
+                selection = android.provider.MediaStore.Files.FileColumns.MIME_TYPE + " LIKE ? OR " + android.provider.MediaStore.Files.FileColumns.MIME_TYPE + " LIKE ?"
+                selectionArgs = arrayOf("application/pdf", "text/%")
+            }
+            context.getString(com.example.files.R.string.installations) -> {
+                selection = android.provider.MediaStore.Files.FileColumns.DATA + " LIKE ?"
+                selectionArgs = arrayOf("%.apk")
+            }
+        }
+        
+        if (selection != null) {
+            context.contentResolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
+                val dataCol = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Files.FileColumns.DATA)
+                while (cursor.moveToNext()) {
+                    val path = cursor.getString(dataCol)
+                    files.add(JFile(path, context))
+                }
+            }
+        }
+        return files
+    }
+
+    private fun getFilesList(folder: java.io.File): List<java.io.File> {
+        return folder.listFiles()?.toList() ?: emptyList()
+    }
+
+    private fun getJFiles(context: Context, files: List<java.io.File>): List<JFile> {
+        return files.filter { com.example.files.Statics.showHiddenFiles || !it.name.startsWith(".") }.map { JFile(it, context) }
     }
 
     fun toggleViewType() {

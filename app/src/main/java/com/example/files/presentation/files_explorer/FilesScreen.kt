@@ -95,7 +95,6 @@ import com.example.files.activities.SettingsActivity
 import com.example.files.components.FastScroller
 import com.example.files.components.FileIcon
 import com.example.files.components.PathBreadcrumbs
-import com.example.files.fragments.FragmentBase
 import com.example.files.listeners.OnMultiSelectedChange
 import com.example.files.models.JFile
 import com.example.files.utils.PathFormatter
@@ -111,14 +110,41 @@ import java.io.File
 
 import dagger.hilt.android.AndroidEntryPoint
 
+import androidx.fragment.app.Fragment
+import com.example.files.viewmodels.FilesMode
+
 @AndroidEntryPoint
-class FilesFragment : FragmentBase(FragmentType.FILES) {
+class FilesFragment : Fragment() {
     private lateinit var filesViewModel: FilesViewModel
+    private var mode: FilesMode = FilesMode.Normal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.parent = Statics.folder
         filesViewModel = ViewModelProvider(this)[FilesViewModel::class.java]
+        
+        arguments?.let {
+            val modeType = it.getString("MODE_TYPE")
+            mode = when (modeType) {
+                "RECENT" -> FilesMode.Recent
+                "FAVORITES" -> FilesMode.Favorites
+                "CATEGORY" -> FilesMode.Category(it.getString("CATEGORY_NAME") ?: "")
+                "ZIPPED" -> FilesMode.Zipped(File(it.getString("ZIPPED_FILE_PATH") ?: ""))
+                else -> FilesMode.Normal
+            }
+        }
+    }
+    
+    companion object {
+        @JvmStatic
+        fun newInstance(modeType: String, categoryName: String? = null, zippedPath: String? = null): FilesFragment {
+            val fragment = FilesFragment()
+            val args = Bundle()
+            args.putString("MODE_TYPE", modeType)
+            if (categoryName != null) args.putString("CATEGORY_NAME", categoryName)
+            if (zippedPath != null) args.putString("ZIPPED_FILE_PATH", zippedPath)
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     override fun onCreateView(
@@ -141,28 +167,45 @@ class FilesFragment : FragmentBase(FragmentType.FILES) {
         }
     }
 
-    override fun onCreateView(v: View?) {}
+    fun loadList() {
+        filesViewModel.refreshList(requireContext(), mode)
+    }
 
-    override fun loadList() {
+    fun refresh() {
         filesViewModel.refreshList(requireContext())
     }
 
-    override fun refresh() {
-        filesViewModel.refreshList(requireContext())
-    }
-
-    override fun notVisible(): Boolean {
+    fun notVisible(): Boolean {
         return !Statics.isVisible(Statics.TAG_FOLDER)
     }
 
-    // Override to prevent NPE on binding since we completely replaced the XML view
-    override fun animate() {}
-    override fun refreshRecyclerPadding(addSpace: Boolean) {}
-    override fun refreshGrid() {}
-    override fun refreshActionsList() {}
-    override fun setListeners() {}
+    fun animate() {}
+    fun refreshRecyclerPadding(addSpace: Boolean) {}
+    fun refreshGrid() {}
+    fun refreshActionsList() {}
+    fun setListeners() {}
 
-    override fun setListListener() {
+    fun isFilesType(): Boolean = true
+    
+    fun isTypeFiles(): Boolean = true
+
+    @JvmField
+    var isArchive: Boolean = false
+    
+    @JvmField
+    var zipPosition: Int = 0
+
+    fun applySettings() {
+        if (::filesViewModel.isInitialized) {
+            filesViewModel.refreshList(requireContext())
+        }
+    }
+
+    fun select(path: String) {
+        // To be implemented or handled by viewmodel
+    }
+
+    fun setListListener() {
         MainActivity.instance?.addMultiSelectedChangeListener(object : OnMultiSelectedChange {
             override fun onMultiSelectedChange(multiSelected: Boolean) {
                 if (!multiSelected) {
@@ -172,6 +215,11 @@ class FilesFragment : FragmentBase(FragmentType.FILES) {
             override fun onRefresh() {}
             override fun onRefreshActionsList() {}
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadList()
     }
 }
 
@@ -189,9 +237,13 @@ fun FilesScreen(
     var menuExpanded by remember { mutableStateOf(false) }
     var showSortDialog by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val formattedPath = remember(uiState.currentPath) {
-        val full = PathFormatter(context).format(uiState.currentPath)
-        full.split("/").lastOrNull() ?: uiState.currentPathName
+    val formattedPath = remember(uiState.currentPath, uiState.currentPathName, uiState.mode) {
+        if (uiState.mode != com.example.files.viewmodels.FilesMode.Normal) {
+            uiState.currentPathName
+        } else {
+            val full = PathFormatter(context).format(uiState.currentPath)
+            full.split("/").lastOrNull() ?: uiState.currentPathName
+        }
     }
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 
@@ -303,6 +355,8 @@ fun FilesScreen(
                                         R.string.items_chosen,
                                         uiState.selectedFiles.size.toString()
                                     )
+                                } else if (uiState.mode != com.example.files.viewmodels.FilesMode.Normal) {
+                                    uiState.currentPathName
                                 } else if (uiState.currentPath == Environment.getExternalStorageDirectory().path) {
                                     stringResource(R.string.internal_storage)
                                 } else {
@@ -428,7 +482,7 @@ fun FilesScreen(
                 )
                 
                 androidx.compose.animation.AnimatedVisibility(
-                    visible = uiState.selectedFiles.isEmpty(),
+                    visible = uiState.selectedFiles.isEmpty() && uiState.mode == com.example.files.viewmodels.FilesMode.Normal,
                     enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
                     exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
                 ) {

@@ -33,7 +33,7 @@ import com.example.files.actions.DialogDelete;
 import com.example.files.database.DBHelper;
 import com.example.files.view.Note;
 import com.example.files.actions.DialogBase;
-import com.example.files.fragments.FragmentBase;
+import com.example.files.presentation.files_explorer.FilesFragment;
 import com.example.files.presentation.search.SearchScreen;
 import com.example.files.models.JFile;
 import com.example.files.models.StorageItem;
@@ -75,9 +75,10 @@ public class Statics {
     public static final int BYTE = 10, KB = 10240, MB = 20480;
     public static final int REQUEST_CODE_OPEN_DOCUMENT_TREE = 4010;
     @SuppressLint("StaticFieldLeak")
-    public static FragmentBase currentFragment;
+    public static FilesFragment currentFragment;
     @SuppressLint("StaticFieldLeak")
     public static SearchScreen searchFragment;
+    public enum FragmentType { FILES, CATEGORY, MAIN, RECENT, FAVORITES, ARCHIVE, SEARCH }
     // operations
     @SuppressLint("StaticFieldLeak")
     public static ArrayList<DialogBase> actions;

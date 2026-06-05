@@ -4,7 +4,7 @@ import static com.example.files.MainActivity.closeAllFragments;
 import static com.example.files.MainActivity.instance;
 import static com.example.files.Statics.openRecent;
 import static com.example.files.Statics.showRecent;
-import static com.example.files.fragments.FragmentBase.FragmentType.MAIN;
+import static com.example.files.Statics.FragmentType.MAIN;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
