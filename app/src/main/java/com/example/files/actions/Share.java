@@ -37,7 +37,7 @@ public class Share {
             if(selectedJFiles.size()==1){
                 File file = selectedJFiles.get(0);
                 Uri uri = FileProvider.getUriForFile(activity,
-                        "com.example.files", file);
+                        activity.getPackageName(), file);
                 MimeTypeMap mimeType = MimeTypeMap.getSingleton();
                 String type = mimeType.getMimeTypeFromExtension(file.getName().
                         substring(file.getName().lastIndexOf(".") + 1).toLowerCase());
@@ -53,7 +53,7 @@ public class Share {
 
                 for (JFile jFile : selectedJFiles) {
                     uris.add(FileProvider.getUriForFile(activity,
-                            "com.example.files", jFile));
+                            activity.getPackageName(), jFile));
                 }
                 share.putParcelableArrayListExtra(EXTRA_STREAM, uris);
             }
