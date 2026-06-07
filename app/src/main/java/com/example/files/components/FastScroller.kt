@@ -1,5 +1,6 @@
 package com.example.files.components
 
+import android.annotation.SuppressLint
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@SuppressLint("FrequentlyChangingValue", "LocalContextResourcesRead")
 @Composable
 fun FastScroller(
     gridState: LazyGridState,

@@ -178,7 +178,7 @@ public class ImageDescription extends LinearLayout {
     public void openFiles() {
         Uri uri;
         if (jFile.isDocumentFile()) uri = jFile.getDocumentFile().getUri();
-        else uri = FileProvider.getUriForFile(activity, "com.example.files", jFile);
+        else uri = FileProvider.getUriForFile(activity, activity.getPackageName(), jFile);
         MimeTypeMap mimeType = MimeTypeMap.getSingleton();
         String type = mimeType.getMimeTypeFromExtension(jFile.getName().substring(jFile.getName().lastIndexOf(".") + 1).toLowerCase());
         //Toast.makeText(context, type, Toast.LENGTH_SHORT).show();

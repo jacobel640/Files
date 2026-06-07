@@ -116,7 +116,7 @@ import com.example.files.viewmodels.FilesMode
 @AndroidEntryPoint
 class FilesFragment : Fragment() {
     private lateinit var filesViewModel: FilesViewModel
-    private var mode: FilesMode = FilesMode.Normal
+    private var mode: FilesMode = FilesMode.Normal()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,19 +129,24 @@ class FilesFragment : Fragment() {
                 "FAVORITES" -> FilesMode.Favorites
                 "CATEGORY" -> FilesMode.Category(it.getString("CATEGORY_NAME") ?: "")
                 "ZIPPED" -> FilesMode.Zipped(File(it.getString("ZIPPED_FILE_PATH") ?: ""))
-                else -> FilesMode.Normal
+                "NORMAL" -> {
+                    val path = it.getString("FILE_PATH")
+                    if (path != null) FilesMode.Normal(File(path)) else FilesMode.Normal()
+                }
+                else -> FilesMode.Normal()
             }
         }
     }
     
     companion object {
         @JvmStatic
-        fun newInstance(modeType: String, categoryName: String? = null, zippedPath: String? = null): FilesFragment {
+        fun newInstance(modeType: String, categoryName: String? = null, zippedPath: String? = null, folderPath: String? = null): FilesFragment {
             val fragment = FilesFragment()
             val args = Bundle()
             args.putString("MODE_TYPE", modeType)
             if (categoryName != null) args.putString("CATEGORY_NAME", categoryName)
             if (zippedPath != null) args.putString("ZIPPED_FILE_PATH", zippedPath)
+            if (folderPath != null) args.putString("FILE_PATH", folderPath)
             fragment.arguments = args
             return fragment
         }
@@ -219,7 +224,9 @@ class FilesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadList()
+        if (filesViewModel.uiState.value.files.isEmpty()) {
+            loadList()
+        }
     }
 }
 
@@ -238,7 +245,7 @@ fun FilesScreen(
     var showSortDialog by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val formattedPath = remember(uiState.currentPath, uiState.currentPathName, uiState.mode) {
-        if (uiState.mode != com.example.files.viewmodels.FilesMode.Normal) {
+        if (uiState.mode !is com.example.files.viewmodels.FilesMode.Normal) {
             uiState.currentPathName
         } else {
             val full = PathFormatter(context).format(uiState.currentPath)
@@ -355,7 +362,7 @@ fun FilesScreen(
                                         R.string.items_chosen,
                                         uiState.selectedFiles.size.toString()
                                     )
-                                } else if (uiState.mode != com.example.files.viewmodels.FilesMode.Normal) {
+                                } else if (uiState.mode !is com.example.files.viewmodels.FilesMode.Normal) {
                                     uiState.currentPathName
                                 } else if (uiState.currentPath == Environment.getExternalStorageDirectory().path) {
                                     stringResource(R.string.internal_storage)
@@ -474,6 +481,11 @@ fun FilesScreen(
                                         uiState.selectedFiles.forEach { Statics.favorites.addToFavorites(it) }
                                         viewModel.clearSelection()
                                     })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.share)) }, onClick = { 
+                                        menuExpanded = false
+                                        com.example.files.actions.Share(context)
+                                        viewModel.clearSelection()
+                                    })
                                 }
                             }
                         }
@@ -482,7 +494,7 @@ fun FilesScreen(
                 )
                 
                 androidx.compose.animation.AnimatedVisibility(
-                    visible = uiState.selectedFiles.isEmpty() && uiState.mode == com.example.files.viewmodels.FilesMode.Normal,
+                    visible = uiState.selectedFiles.isEmpty(),
                     enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
                     exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
                 ) {

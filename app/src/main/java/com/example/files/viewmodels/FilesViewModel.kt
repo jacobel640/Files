@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.ArrayList
+import java.io.File
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -22,16 +23,16 @@ data class FilesUiState(
     val selectedFiles: List<JFile> = emptyList(),
     val isGridView: Boolean = false,
     val isAllSelectedFavorites: Boolean = false,
-    val mode: FilesMode = FilesMode.Normal,
+    val mode: FilesMode = FilesMode.Normal(),
     val error: String? = null
 )
 
 sealed class FilesMode {
-    object Normal : FilesMode()
+    data class Normal(val file: File? = null) : FilesMode()
     object Recent : FilesMode()
     object Favorites : FilesMode()
     data class Category(val name: String) : FilesMode()
-    data class Zipped(val file: java.io.File) : FilesMode()
+    data class Zipped(val file: File) : FilesMode()
 }
 
 @HiltViewModel
@@ -53,26 +54,29 @@ class FilesViewModel @Inject constructor() : ViewModel() {
                 when (mode) {
                     is FilesMode.Recent -> {
                         newFiles = refreshRecents(context)
-                        _uiState.value = _uiState.value.copy(currentPathName = context.getString(com.example.files.R.string.recent_files))
+                        val name = context.getString(com.example.files.R.string.recent_files)
+                        _uiState.value = _uiState.value.copy(currentPath = name, currentPathName = name)
                     }
                     is FilesMode.Favorites -> {
                         newFiles = refreshFavorites(context)
-                        _uiState.value = _uiState.value.copy(currentPathName = context.getString(com.example.files.R.string.favorites))
+                        val name = context.getString(com.example.files.R.string.favorites)
+                        _uiState.value = _uiState.value.copy(currentPath = name, currentPathName = name)
                     }
                     is FilesMode.Category -> {
                         newFiles = getSFiles(context, mode.name)
-                        _uiState.value = _uiState.value.copy(currentPathName = mode.name)
+                        _uiState.value = _uiState.value.copy(currentPath = mode.name, currentPathName = mode.name)
                     }
                     is FilesMode.Zipped -> {
                         newFiles = getJFiles(context, getFilesList(mode.file))
-                        _uiState.value = _uiState.value.copy(currentPathName = mode.file.name)
+                        _uiState.value = _uiState.value.copy(currentPath = mode.file.path, currentPathName = mode.file.name)
                     }
                     is FilesMode.Normal -> {
-                        if (Statics.folder != null) {
-                            newFiles = getJFiles(context, getFilesList(Statics.folder))
+                        val folder = mode.file ?: Statics.folder
+                        if (folder != null) {
+                            newFiles = getJFiles(context, getFilesList(folder))
                             _uiState.value = _uiState.value.copy(
-                                currentPath = Statics.folder.path,
-                                currentPathName = Statics.folder.name
+                                currentPath = folder.path,
+                                currentPathName = folder.name
                             )
                         }
                     }
@@ -106,9 +110,12 @@ class FilesViewModel @Inject constructor() : ViewModel() {
             while (cursor.moveToNext() && count < 2000) {
                 val path = cursor.getString(dataCol)
                 val jFile = JFile(path, context)
-                if (!jFile.isDirectory && !jFile.isHidden) {
-                    recent.add(jFile)
-                    count++
+                if (filterRecent(jFile)) {
+                    val m60DaysAgo = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, -60) }.timeInMillis
+                    if (jFile.lastModified() > m60DaysAgo) {
+                        recent.add(jFile)
+                        count++
+                    } else break
                 }
             }
         }
@@ -120,39 +127,79 @@ class FilesViewModel @Inject constructor() : ViewModel() {
         return favsDb.allPaths.map { JFile(it, context) }
     }
 
+    private fun filterRecent(file: File): Boolean {
+        return file.isFile &&
+                file.name.contains(".") &&
+                !file.isDirectory && file.length() != 0L &&
+                !file.absolutePath.startsWith("/storage/emulated/0/Android") &&
+                !(file.parentFile?.path?.endsWith("WhatsApp/Databases") ?: false) &&
+                !(file.parentFile?.path?.endsWith("WhatsApp/Backups") ?: false) &&
+                isRecentValid(file.name.substring(file.name.lastIndexOf(".") + 1).lowercase())
+    }
+
+    private fun isRecentValid(extension: String): Boolean {
+        return when (extension) {
+            "", "m3u", "log", "tmp", "temp", "bak", "bkup", "backup", "crypt1", "crypt12" -> false
+            else -> true
+        }
+    }
+
     private fun getSFiles(context: Context, categoryName: String): List<JFile> {
         val files = mutableListOf<JFile>()
-        val uri = android.provider.MediaStore.Files.getContentUri("external")
-        val projection = arrayOf(android.provider.MediaStore.Files.FileColumns.DATA)
+        var uri = android.provider.MediaStore.Files.getContentUri("external")
         var selection: String? = null
         var selectionArgs: Array<String>? = null
-        
+        var sortOrder: String? = android.provider.MediaStore.Audio.Media.DATE_MODIFIED + " ASC"
+
         when (categoryName) {
-            context.getString(com.example.files.R.string.pictures) -> {
-                selection = android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+            "picture" -> {
+                uri = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    android.provider.MediaStore.Images.Media.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL)
+                } else android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             }
-            context.getString(com.example.files.R.string.video) -> {
-                selection = android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
+            "video" -> {
+                uri = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    android.provider.MediaStore.Video.Media.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL)
+                } else android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI
             }
-            context.getString(com.example.files.R.string.audio) -> {
-                selection = android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO
+            "audio" -> {
+                uri = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    android.provider.MediaStore.Audio.Media.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL)
+                } else android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
             }
-            context.getString(com.example.files.R.string.documents) -> {
-                selection = android.provider.MediaStore.Files.FileColumns.MIME_TYPE + " LIKE ? OR " + android.provider.MediaStore.Files.FileColumns.MIME_TYPE + " LIKE ?"
-                selectionArgs = arrayOf("application/pdf", "text/%")
+            "downloads" -> {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    uri = android.provider.MediaStore.Downloads.getContentUri("external")
+                } else {
+                    selection = android.provider.MediaStore.Files.FileColumns.DATA + " LIKE ?"
+                    selectionArgs = arrayOf("%/Download/%")
+                }
             }
-            context.getString(com.example.files.R.string.installations) -> {
+            "apk" -> {
                 selection = android.provider.MediaStore.Files.FileColumns.DATA + " LIKE ?"
                 selectionArgs = arrayOf("%.apk")
             }
+            "zip" -> {
+                // ZIPs will be handled via extension filtering later if needed, but for now we fetch all or filter by mime
+            }
+            else -> return emptyList()
         }
-        
-        if (selection != null) {
-            context.contentResolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
-                val dataCol = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Files.FileColumns.DATA)
-                while (cursor.moveToNext()) {
-                    val path = cursor.getString(dataCol)
-                    files.add(JFile(path, context))
+
+        context.contentResolver.query(uri, arrayOf(android.provider.MediaStore.Files.FileColumns.DATA), selection, selectionArgs, sortOrder)?.use { cursor ->
+            val dataCol = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Files.FileColumns.DATA)
+            while (cursor.moveToNext()) {
+                val path = cursor.getString(dataCol)
+                val jFile = JFile(path, context)
+                if (jFile.length() != 0L) {
+                    if (categoryName == "zip") {
+                        if (jFile.type == JFile.Type.ARCHIVE) files.add(jFile)
+                    } else if (categoryName == "apk" || categoryName == "downloads" || categoryName == "picture" || categoryName == "audio" || categoryName == "video") {
+                        files.add(jFile)
+                    } else {
+                        if (jFile.nameTLC.endsWith("." + categoryName.lowercase()) && jFile.isFile) {
+                            files.add(jFile)
+                        }
+                    }
                 }
             }
         }

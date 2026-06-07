@@ -330,12 +330,12 @@ public class MainActivity extends BaseActivity {
 
     public Fragment newFragment(File file) {
         folder = file;
-        return currentFragment = new FilesFragment();
+        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("NORMAL", null, null, file.getPath());
     }
 
     public Fragment newZippedFragment(File file) {
         folder = file;
-        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("ZIPPED", null, file.getPath());
+        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("ZIPPED", null, file.getPath(), null);
     }
 
     public Fragment newSFragment(String category, ArrayList<JFile> jFiles) {
@@ -344,10 +344,10 @@ public class MainActivity extends BaseActivity {
     }
 
     public Fragment newDFragment(String category) {
-        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("CATEGORY", category, null);
+        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("CATEGORY", category, null, null);
     }
     public Fragment newRFragment() {
-        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("RECENT", null, null);
+        return currentFragment = com.example.files.presentation.files_explorer.FilesFragment.newInstance("RECENT", null, null, null);
     }
 
     public void loadFragment(Fragment fragment, String tag) {

@@ -125,17 +125,17 @@ public class JFile extends File implements Comparable<File> {
     }
 
     public DocumentFile getDocumentFileOrig() {
-        Uri uri = FileProvider.getUriForFile(context, "com.example.files", this);
+        Uri uri = FileProvider.getUriForFile(context, context.getPackageName(), this);
         return DocumentFile.fromSingleUri(context, uri);
     }
 
     public DocumentFile getDocumentFile() {
-        String uri = new PathFormatter(context).externalFilePathWoName(FileProvider.getUriForFile(context, "com.example.files", this).toString());
+        String uri = new PathFormatter(context).externalFilePathWoName(FileProvider.getUriForFile(context, context.getPackageName(), this).toString());
         return DocumentFile.fromSingleUri(context, Uri.parse(uri));
     }
 
     public DocumentFile getDocumentTree() {
-        String uri = new PathFormatter(context).externalFilePathWoName(FileProvider.getUriForFile(context, "com.example.files", this).toString());
+        String uri = new PathFormatter(context).externalFilePathWoName(FileProvider.getUriForFile(context, context.getPackageName(), this).toString());
         return DocumentFile.fromTreeUri(context, Uri.parse(uri));
     }
 
