@@ -38,7 +38,7 @@ public class JFileContent {
 
     private static void addItem(JFile item) {
         ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
+        ITEM_MAP.put(item.getId(), item);
     }
 
     private static JFile createPlaceholderItem(int position) {
