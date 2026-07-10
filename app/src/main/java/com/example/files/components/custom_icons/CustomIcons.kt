@@ -1,12 +1,6 @@
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 
-val Icons.iconBackground: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.background
+fun ColorScheme.iconBackground(): Color = background
 
-val Icons.iconPrimary: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.primary
+fun ColorScheme.iconPrimary(): Color = primary

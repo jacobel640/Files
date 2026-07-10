@@ -18,8 +18,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -41,6 +46,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -67,6 +73,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
@@ -97,6 +104,7 @@ import com.example.files.components.FileIcon
 import com.example.files.components.PathBreadcrumbs
 import com.example.files.listeners.OnMultiSelectedChange
 import com.example.files.models.JFile
+import com.example.files.ui.theme.FilesTheme
 import com.example.files.utils.PathFormatter
 import com.example.files.viewmodels.FilesViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -158,7 +166,7 @@ class FilesFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                MaterialTheme {
+                FilesTheme {
                     Surface(color = MaterialTheme.colorScheme.background) {
                         FilesScreen(
                             viewModel = filesViewModel,
@@ -174,6 +182,10 @@ class FilesFragment : Fragment() {
 
     fun loadList() {
         filesViewModel.refreshList(requireContext(), mode)
+    }
+
+    fun clearSelection() {
+        filesViewModel.clearSelection()
     }
 
     fun refresh() {
@@ -323,23 +335,71 @@ fun FilesScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             Column(
-                modifier = Modifier.background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.surface,
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.0f)
+                modifier = Modifier
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.surface,
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.0f)
+                            )
                         )
                     )
-                )
+                    .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.statusBars)
             ) {
-                LargeTopAppBar(
-                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                val density = androidx.compose.ui.platform.LocalDensity.current
+                val maxOffsetPx = with(density) { -120.dp.toPx() }
+                LaunchedEffect(maxOffsetPx) {
+                    scrollBehavior.state.heightOffsetLimit = maxOffsetPx
+                }
+
+                val scrollOffsetPx = scrollBehavior.state.heightOffset
+                val scrollOffsetDp = with(density) { scrollOffsetPx.toDp() }
+                
+                val showToolbarTitle = scrollOffsetPx <= maxOffsetPx * 0.7f
+                val titleAlpha = if (maxOffsetPx == 0f) 1f else (1f - (scrollOffsetPx / maxOffsetPx)).coerceIn(0f, 1f)
+                val boxHeight = androidx.compose.ui.unit.max(0.dp, 120.dp + scrollOffsetDp)
+
+                if (boxHeight > 0.dp) {
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(boxHeight),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.material3.Text(
+                            text = if (uiState.mode !is com.example.files.viewmodels.FilesMode.Normal) {
+                                uiState.currentPathName
+                            } else if (uiState.currentPath == android.os.Environment.getExternalStorageDirectory().path) {
+                                stringResource(R.string.internal_storage)
+                            } else {
+                                java.io.File(uiState.currentPath).name
+                            },
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 35.sp,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .graphicsLayer { alpha = titleAlpha },
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+
+                TopAppBar(
+                    windowInsets = WindowInsets(0.dp),
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent
                     ),
                     title = {
-                        Row(
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = showToolbarTitle || uiState.selectedFiles.isNotEmpty(),
+                            enter = androidx.compose.animation.fadeIn(),
+                            exit = androidx.compose.animation.fadeOut()
+                        ) {
+                            Row(
                             modifier = Modifier.clickable(
                                 onClick = {
                                     if (uiState.selectedFiles.isNotEmpty()) viewModel.selectAll()
@@ -374,6 +434,7 @@ fun FilesScreen(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
+                        }
                         }
                     },
                     navigationIcon = {
@@ -489,8 +550,7 @@ fun FilesScreen(
                                 }
                             }
                         }
-                    },
-                    scrollBehavior = scrollBehavior
+                    }
                 )
                 
                 androidx.compose.animation.AnimatedVisibility(

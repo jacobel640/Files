@@ -25,8 +25,8 @@ val Icons.Rounded.CtgArchive: ImageVector
         val current = _ctgArchive
         if (current != null) return current
 
-        val primary = Icons.iconPrimary
-        val background = Icons.iconBackground
+        val primary = MaterialTheme.colorScheme.iconPrimary()
+        val background = MaterialTheme.colorScheme.iconBackground()
 
         return ImageVector.Builder(
             name = "MaterialTheme.CtgArchive",

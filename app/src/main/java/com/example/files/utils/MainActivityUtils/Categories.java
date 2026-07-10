@@ -61,7 +61,7 @@ public class Categories {
                 new Category("video", getString(R.string.video), getDrawable(R.drawable.ctg_video)),
                 new Category("apk", getString(R.string.installations), getDrawable(R.drawable.ctg_apk)),
                 new Category("downloads", getString(R.string.downloads), getDrawable(R.drawable.ctg_downloads)),
-                new Category("zip", getString(R.string.compressed), getDrawable(R.drawable.ctg_archive)));
+                new Category("archive", getString(R.string.compressed), getDrawable(R.drawable.ctg_archive)));
 
         CategoriesAdapter adapter = new CategoriesAdapter(categories);
         recyclerView.setAdapter(adapter);

@@ -25,7 +25,7 @@ val Icons.Rounded.ExtExcel: ImageVector
         val current = _extExcel
         if (current != null) return current
 
-        val background = Icons.iconBackground
+        val background = MaterialTheme.colorScheme.iconBackground()
 
         return ImageVector.Builder(
             name = "MaterialTheme.ExtExcel",

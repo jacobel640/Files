@@ -32,7 +32,7 @@ fun FileRowItem(file: JFile) {
     val context = LocalContext.current
     Column {
         Row(
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .fillMaxWidth()
                 .combinedClickable(
                     onClick = {
@@ -45,14 +45,13 @@ fun FileRowItem(file: JFile) {
                     onLongClick = {
                         if (!Statics.multiSelected) {
                             if (file.parentFile != null) {
-                                Statics.openFolder(file.parentFile!!)
-                                Statics.currentFragment?.select(file.path)
+                                Statics.openFolder(file.parentFile!!, file.path)
                             }
                         }
                     }
                 )
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.Companion.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             FileIcon(
                 file = file,

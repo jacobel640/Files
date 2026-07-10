@@ -15,6 +15,7 @@ import javax.inject.Inject
 
 data class SearchUiState(
     val isLoading: Boolean = false,
+    val isFiltering: Boolean = false,
     val searchResults: List<JFile> = emptyList(),
     val error: String? = null
 )
@@ -51,8 +52,21 @@ class SearchViewModel @Inject constructor(private val repository: FileRepository
                         else -> emptyList()
                     }
                 }
-                applyFilters()
                 _uiState.value = _uiState.value.copy(isLoading = false)
+                applyFilters()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+            }
+        }
+    }
+
+    fun reloadAllFiles() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            try {
+                allFiles = repository.getAllSearchFiles()
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                applyFilters()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
             }
@@ -85,23 +99,27 @@ class SearchViewModel @Inject constructor(private val repository: FileRepository
     }
 
     private fun applyFilters() {
-        var filteredList = allFiles
-        
-        if (textQuery.isNotBlank()) {
-            val q = textQuery.lowercase()
-            filteredList = filteredList.filter { it.name.lowercase().contains(q) }
+        viewModelScope.launch(Dispatchers.Default) {
+            _uiState.value = _uiState.value.copy(isFiltering = true)
+            var filteredList = allFiles
+            
+            if (textQuery.isNotBlank()) {
+                val q = textQuery.lowercase()
+                filteredList = filteredList.filter { it.name.lowercase().contains(q) }
+            }
+            
+            if (dateLimit > 0L) {
+                filteredList = filteredList.filter { it.lastModified() >= dateLimit }
+            }
+            
+            if (typeFilter != null) {
+                filteredList = filteredList.filter { it.type == typeFilter }
+            }
+            
+            _uiState.value = _uiState.value.copy(
+                searchResults = filteredList,
+                isFiltering = false
+            )
         }
-        
-        if (dateLimit > 0L) {
-            filteredList = filteredList.filter { it.lastModified() >= dateLimit }
-        }
-        
-        if (typeFilter != null) {
-            filteredList = filteredList.filter { it.type == typeFilter }
-        }
-        
-        _uiState.value = _uiState.value.copy(
-            searchResults = filteredList
-        )
     }
 }

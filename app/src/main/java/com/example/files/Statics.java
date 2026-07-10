@@ -65,6 +65,7 @@ public class Statics {
             isSingleLine, showRecent, showCategories, showFavorites;
     public static int sort, order;
     public static File folder, tempFolder;
+    public static String highlightFile = null;
     public static final String DOC_SLASH = "%2F", DOC_SPACE = "%20";
     public static final String OPS_CHANNEL_ID = "operations_channel";
     public static final String TAG_FOLDER = "folder", TAG_CATEGORY = "category", TAG_SEARCH = "search",
@@ -173,6 +174,11 @@ public class Statics {
 
     }
 
+    public static void openFolder(File file, String highlight) {
+        highlightFile = highlight;
+        openFolder(file);
+    }
+
     public static void openFolder(File file) {
         tempFolder = file;
         if (multiSelected) instance.eventListener.onMultiSelectedChange(false);
@@ -203,10 +209,18 @@ public class Statics {
     }
 
     public static void OpenCategory(String category) {
+        Statics.sort = 2;
+        Statics.order = 1;
+        MainActivity.editor.putInt("SORT", 2).apply();
+        MainActivity.editor.putInt("ORDER", 1).apply();
         instance.loadFragment(instance.newDFragment(category), TAG_CATEGORY);
     }
 
     public static void openRecent() {
+        Statics.sort = 2;
+        Statics.order = 1;
+        MainActivity.editor.putInt("SORT", 2).apply();
+        MainActivity.editor.putInt("ORDER", 1).apply();
         instance.loadFragment(instance.newRFragment(), TAG_RECENT);
     }
 

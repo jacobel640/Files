@@ -32,7 +32,6 @@ import static com.example.files.Statics.startCurrentAction;
 import static com.example.files.Statics.tempFolder;
 import static com.example.files.utils.Animations.hide;
 import static com.example.files.utils.Animations.show;
-import static com.example.files.utils.Animations.show;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -59,7 +58,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
@@ -74,7 +72,6 @@ import androidx.preference.PreferenceManager;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
 import com.example.files.activities.BaseActivity;
-import com.example.files.database.StoragesUri;
 import com.example.files.listeners.OnActivityStateChange;
 import com.example.files.utils.MainActivityUtils.AppShortcuts;
 import com.example.files.utils.MainActivityUtils.Categories;
@@ -230,8 +227,6 @@ public class MainActivity extends BaseActivity {
         categories = new Categories(findViewById(R.id.categories_section)).setOrRefreshCategories();
 
         new AppShortcuts().shortcut(savedInstanceState, this);
-
-        onBackPressedCallback();
     }
 
     private void InitAndRegisterPreferences() {
@@ -289,11 +284,6 @@ public class MainActivity extends BaseActivity {
             getContentResolver().takePersistableUriPermission(uri, takeFlags);
 
             DocumentFile file = DocumentFile.fromTreeUri(this, uri);
-            if (file != null) {
-                StoragesUri storagesUri = new StoragesUri(this);
-                storagesUri.addStorage(file.getName(), file.getUri().getPath(), uri.toString());
-                storagesUri.close();
-            }
 
         } else return;
 
@@ -485,36 +475,12 @@ public class MainActivity extends BaseActivity {
         this.activityListener = evtListener;
     }
 
-    private void homeScreenRefresh() {
+    public void homeScreenRefresh() {
 
         if (recent!=null && permissionGranted()) recent.recentScanner();
         storages.refreshStorage();
         favorites.setOrRefreshFavorites();
         categories.refreshCategories(false);
-    }
-
-    public void onBackPressedCallback() {
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (multiSelected) eventListener.onMultiSelectedChange(false); // when passing to ff using details path button
-                else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    hideKeyboard(MainActivity.this);
-                    remove();
-                    getOnBackPressedDispatcher().onBackPressed();
-                    new Handler().postDelayed(() -> {
-                        try {
-                            getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()-1).onResume();
-                            if (isVisible(TAG_FOLDER)) currentFragment.animate();
-                        } catch (IndexOutOfBoundsException ignored) {}
-
-                    }, 10);
-                } else finish();
-                new Handler().postDelayed(() -> textBtnState(enableTextButton()), 100);
-                onBackPressedCallback();
-            }
-        });
-
     }
 
     public static void textBtnState(boolean enabled) {
@@ -533,7 +499,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public static boolean selfDirectory() {
-        return actions.get(actions.size()-1).checkConflicts();
+        return actions.get(actions.size()-1).hasCircularCopyConflict();
     }
 
     public static void setTextButtonState(Button textView, boolean enabled) {

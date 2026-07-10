@@ -161,6 +161,7 @@
     <string name="downloading">Downloading...</string>
     <string name="title_self_update">Self Update</string>
     <string name="title_changelog">Changelog</string>
+    <string name="filter_two_months">recently</string>
     <string name="download_update">Download Update</string>
     <string name="aplying_dynamic_theme_message">Applying dynamic theme...</string>
     <string name="choose_theme_color">Choose theme color</string>
@@ -168,4 +169,5 @@
     <string name="reset_default_theme_color">Reset</string>
     <string name="no_results">No Results</string>
     <string name="location">Location</string>
+    <string name="search_in_folder">In \'%1$s\'</string>
 </resources>

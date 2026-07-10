@@ -154,6 +154,7 @@
     <string name="title_storage">אחסון</string>
     <string name="error_existed_name_conflict">כבר קיים קובץ עם שם זהה!</string>
     <string name="filter_today">היום</string>
+    <string name="filter_two_months">לאחרונה</string>
     <string name="title_files_self_update">עדכון עצמי של קבצים</string>
     <string name="desc_downloading_new_version">מוריד גרסה חדשה</string>
     <string name="pref_check_for_update">בדוק אם קיים עדכון</string>
@@ -166,4 +167,5 @@
     <string name="apply_theme_color">החל</string>
     <string name="reset_default_theme_color">איפוס</string>
     <string name="no_results">אין תוצאות</string>
+    <string name="search_in_folder">בתוך \'%1$s\'</string>
 </resources>

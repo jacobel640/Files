@@ -211,7 +211,7 @@ public abstract class DialogBase extends DialogProgress {
         if (type == Copy || type == Move)
             ((TextView) actionBar.findViewById(R.id.copy_here)).setText(activity.getText(resAction));
 
-        textBtnState(currentFragment.isFilesType());
+        textBtnState(currentFragment.isFilesType() && hasCircularCopyConflict());
         ((TextView) actionBar.findViewById(R.id.items)).setText(countItems(activity, jFiles.size()));
         actionBar.findViewById(R.id.copy_dialog).setVisibility(View.VISIBLE);
         copyMode = true;
@@ -440,17 +440,13 @@ public abstract class DialogBase extends DialogProgress {
         activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(old)));
     }
 
-    public boolean checkConflicts() {
-        if (!operating) {
-            String[] dest = folder.getPath().split("/");
+    public boolean hasCircularCopyConflict() {
+        if (!operating && folder != null) {
+            String destPath = folder.getPath() + "/";
             for (JFile jFile : jFiles) {
-                String[] target = jFile.getPath().split("/");
-                if (target.length <= dest.length) {
-                    boolean isSub = false;
-                    for (int i = 0; i < target.length; i++) {
-                        isSub = target[i].equals(dest[i]);
-                    }
-                    if (isSub) return true;
+                if (jFile.isDirectory()) {
+                    String targetPath = jFile.getPath() + "/";
+                    if (destPath.startsWith(targetPath)) return true;
                 }
             }
         }

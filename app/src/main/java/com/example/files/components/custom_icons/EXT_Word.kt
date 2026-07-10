@@ -26,7 +26,7 @@ val Icons.Rounded.ExtWord: ImageVector
         val current = _extWord
         if (current != null) return current
 
-        val background = Icons.iconBackground
+        val background = MaterialTheme.colorScheme.iconBackground()
 
         return ImageVector.Builder(
             name = "MaterialTheme.ExtWord",

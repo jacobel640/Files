@@ -28,24 +28,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.files.models.JFile
 import com.example.files.Statics
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.runtime.getValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileGridItem(
     file: JFile,
     isSelected: Boolean = false,
+    isHighlighted: Boolean = false,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     iconContent: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulseAlpha"
+    )
     Column(
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 100.dp)
             .clip(RoundedCornerShape(15.dp))
             .background(
-                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                color = if (isSelected) MaterialTheme.colorScheme.selectedItemColor(alpha = 0.8f)
+                else if (isHighlighted) MaterialTheme.colorScheme.selectedItemColor(alpha = 0.8f).copy(alpha = pulseAlpha)
                 else MaterialTheme.colorScheme.surface,
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(15.dp)
             )
@@ -53,18 +72,18 @@ fun FileGridItem(
                 onClick = onClick
             )
             .padding(4.dp),
-        horizontalAlignment = Alignment.Companion.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box {
             iconContent()
             if (isSelected) {
                 Box(
-                    modifier = Modifier.Companion
+                    modifier = Modifier
                         .size(50.dp)
                         .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)),
-                    contentAlignment = Alignment.Companion.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.CheckCircle,
@@ -75,14 +94,14 @@ fun FileGridItem(
                 }
             }
         }
-        Spacer(modifier = Modifier.Companion.height(4.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = file.name,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = if (Statics.isSingleLine) 1 else 3,
-            overflow = TextOverflow.Companion.Ellipsis,
-            textAlign = TextAlign.Companion.Center
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
         if (Statics.showFileSize) {
             com.example.files.components.FileSizeLabel(

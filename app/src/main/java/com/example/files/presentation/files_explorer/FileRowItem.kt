@@ -32,24 +32,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.files.models.JFile
 import com.example.files.Statics
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.runtime.getValue
 
-val ColorScheme.selectedItemColor: Color
-    @Composable
-    get() = primaryContainer.copy(alpha = 0.5f).compositeOver(background)
+fun ColorScheme.selectedItemColor(alpha: Float = 0.5f): Color =
+    primaryContainer.copy(alpha = alpha).compositeOver(background)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FileRowItem(
     file: JFile,
     isSelected: Boolean = false,
+    isHighlighted: Boolean = false,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     iconContent: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulseAlpha"
+    )
     Column(
         modifier = modifier.background(
-            if (isSelected) MaterialTheme.colorScheme.selectedItemColor
+            if (isSelected) MaterialTheme.colorScheme.selectedItemColor()
+            else if (isHighlighted) MaterialTheme.colorScheme.selectedItemColor(alpha = pulseAlpha)
             else MaterialTheme.colorScheme.surface
         )
     ) {

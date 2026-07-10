@@ -43,12 +43,15 @@ fun PathBreadcrumbs(
     val segments = relativePath.split("/").filter { it.isNotEmpty() }
     
     val segmentsWithPaths = buildList {
-        add(Pair("Internal Storage", rootDir))
-        
-        var currentAccPath = rootDir
-        for (segment in segments) {
-            currentAccPath += "/$segment"
-            add(Pair(segment, currentAccPath))
+        if (isInternal) {
+            add(Pair("Internal Storage", rootDir))
+            var currentAccPath = rootDir
+            for (segment in segments) {
+                currentAccPath += "/$segment"
+                add(Pair(segment, currentAccPath))
+            }
+        } else {
+            add(Pair(currentPath, currentPath))
         }
     }
     

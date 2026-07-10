@@ -16,7 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 data class FilesUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val currentPath: String = "",
     val currentPathName: String = "",
     val files: List<JFile> = emptyList(),
@@ -47,24 +47,44 @@ class FilesViewModel @Inject constructor() : ViewModel() {
     val uiState: StateFlow<FilesUiState> = _uiState.asStateFlow()
 
     fun refreshList(context: Context, mode: FilesMode = _uiState.value.mode) {
+        val pathName = when (mode) {
+            is FilesMode.Recent -> context.getString(com.example.files.R.string.recent_files)
+            is FilesMode.Favorites -> context.getString(com.example.files.R.string.favorites)
+            is FilesMode.Category -> {
+                when (mode.name) {
+                    "picture" -> context.getString(com.example.files.R.string.pictures)
+                    "video" -> context.getString(com.example.files.R.string.video)
+                    "audio" -> context.getString(com.example.files.R.string.audio)
+                    "apk" -> context.getString(com.example.files.R.string.installations)
+                    "document" -> context.getString(com.example.files.R.string.documents)
+                    "archive" -> context.getString(com.example.files.R.string.compressed)
+                    "downloads" -> context.getString(com.example.files.R.string.downloads)
+                    else -> mode.name
+                }
+            }
+            is FilesMode.Zipped -> mode.file.name
+            is FilesMode.Normal -> mode.file?.name ?: context.getString(com.example.files.R.string.internal_storage)
+        }
+        val path = when (mode) {
+            is FilesMode.Normal -> mode.file?.path ?: android.os.Environment.getExternalStorageDirectory().path
+            is FilesMode.Zipped -> mode.file.path
+            else -> pathName
+        }
+
+        _uiState.value = _uiState.value.copy(isLoading = true, mode = mode, currentPath = path, currentPathName = pathName)
+        
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.value = _uiState.value.copy(isLoading = true, mode = mode)
             try {
                 var newFiles: List<JFile> = emptyList()
                 when (mode) {
                     is FilesMode.Recent -> {
                         newFiles = refreshRecents(context)
-                        val name = context.getString(com.example.files.R.string.recent_files)
-                        _uiState.value = _uiState.value.copy(currentPath = name, currentPathName = name)
                     }
                     is FilesMode.Favorites -> {
                         newFiles = refreshFavorites(context)
-                        val name = context.getString(com.example.files.R.string.favorites)
-                        _uiState.value = _uiState.value.copy(currentPath = name, currentPathName = name)
                     }
                     is FilesMode.Category -> {
                         newFiles = getSFiles(context, mode.name)
-                        _uiState.value = _uiState.value.copy(currentPath = mode.name, currentPathName = mode.name)
                     }
                     is FilesMode.Zipped -> {
                         newFiles = getJFiles(context, getFilesList(mode.file))
@@ -168,18 +188,14 @@ class FilesViewModel @Inject constructor() : ViewModel() {
                 } else android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
             }
             "downloads" -> {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    uri = android.provider.MediaStore.Downloads.getContentUri("external")
-                } else {
-                    selection = android.provider.MediaStore.Files.FileColumns.DATA + " LIKE ?"
-                    selectionArgs = arrayOf("%/Download/%")
-                }
+                selection = android.provider.MediaStore.Files.FileColumns.DATA + " LIKE ?"
+                selectionArgs = arrayOf("%/Download/%")
             }
             "apk" -> {
                 selection = android.provider.MediaStore.Files.FileColumns.DATA + " LIKE ?"
                 selectionArgs = arrayOf("%.apk")
             }
-            "zip" -> {
+            "archive" -> {
                 // ZIPs will be handled via extension filtering later if needed, but for now we fetch all or filter by mime
             }
             else -> return emptyList()
@@ -191,10 +207,10 @@ class FilesViewModel @Inject constructor() : ViewModel() {
                 val path = cursor.getString(dataCol)
                 val jFile = JFile(path, context)
                 if (jFile.length() != 0L) {
-                    if (categoryName == "zip") {
+                    if (categoryName == "archive") {
                         if (jFile.type == JFile.Type.ARCHIVE) files.add(jFile)
                     } else if (categoryName == "apk" || categoryName == "downloads" || categoryName == "picture" || categoryName == "audio" || categoryName == "video") {
-                        files.add(jFile)
+                        if (jFile.type != JFile.Type.FOLDER) files.add(jFile)
                     } else {
                         if (jFile.nameTLC.endsWith("." + categoryName.lowercase()) && jFile.isFile) {
                             files.add(jFile)
@@ -228,6 +244,14 @@ class FilesViewModel @Inject constructor() : ViewModel() {
             current.add(file)
         }
         updateSelection(current)
+    }
+
+    fun selectFile(file: JFile) {
+        val current = _uiState.value.selectedFiles.toMutableList()
+        if (!current.contains(file)) {
+            current.add(file)
+            updateSelection(current)
+        }
     }
 
     private var preDragSelection = emptyList<JFile>()

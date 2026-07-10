@@ -24,7 +24,7 @@ val Icons.Rounded.ExtFolder: ImageVector
         val current = _extFolder
         if (current != null) return current
 
-        val primary = Icons.iconPrimary
+        val primary = MaterialTheme.colorScheme.iconPrimary()
 
         return ImageVector.Builder(
             name = "CustomVector",

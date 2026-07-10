@@ -19,18 +19,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBackIos
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,16 +62,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+
 import com.example.files.R
 import com.example.files.Statics
-import com.example.files.data.FileRepository
 import com.example.files.models.JFile
+import com.example.files.ui.theme.FilesTheme
 import com.example.files.viewmodels.SearchViewModel
-import java.util.Calendar
-
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Calendar
 
 @AndroidEntryPoint
 class SearchScreen() : Fragment() {
@@ -98,12 +101,12 @@ class SearchScreen() : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                MaterialTheme {
-                    Surface(color = MaterialTheme.colorScheme.background) {
+                FilesTheme {
+                    Surface(color = androidx.compose.material3.MaterialTheme.colorScheme.background) {
                         SearchScreenContent(
                             viewModel = searchViewModel,
                             onBackClick = { requireActivity().onBackPressed() },
-                            showTypeFilters = category == "search" || category == "recent" || category == "downloads",
+                            showTypeFilters = true,
                             category = category,
                             initialFiles = jFiles
                         )
@@ -126,11 +129,32 @@ fun SearchScreenContent(
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var filtersExpanded by remember { mutableStateOf(false) }
-    
-    var selectedDateLimit by remember { mutableStateOf<Int?>(null) }
-    var selectedType by remember { mutableStateOf<JFile.Type?>(null) }
-    var searchInFolder by remember { mutableStateOf(category == "folder") }
+
+    var selectedDateLimit by remember { mutableStateOf<Int?>(if (category == "recent") -60 else null) }
+    var selectedType by remember {
+        mutableStateOf<JFile.Type?>(
+            when (category) {
+                "picture" -> JFile.Type.IMAGE
+                "video" -> JFile.Type.VIDEO
+                "audio" -> JFile.Type.AUDIO
+                "document" -> JFile.Type.DOCUMENT
+                "apk" -> JFile.Type.APK
+                "archive" -> JFile.Type.ARCHIVE
+                else -> null
+            }
+        )
+    }
+    var searchInFolder by remember { mutableStateOf(category == "folder" || category == "downloads") }
     val context = LocalContext.current
+    var hasReloadedAllFiles by remember { mutableStateOf(category == "search" || category == "folder" || category == "downloads") }
+    val hasActiveFilters = searchInFolder || selectedDateLimit != null || selectedType != null
+
+    fun checkReload() {
+        if (!hasReloadedAllFiles) {
+            hasReloadedAllFiles = true
+            viewModel.reloadAllFiles()
+        }
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing
@@ -209,17 +233,23 @@ fun SearchScreenContent(
                     }
 
                     // Collapsible Filters Card
+                    val cardContainerColor = if (filtersExpanded) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                        colors = CardDefaults.cardColors(containerColor = cardContainerColor)
                     ) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .background(
+                                        color = if (!filtersExpanded && hasActiveFilters)
+                                            MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                                        shape = RoundedCornerShape(0.dp)
+                                    )
                                     .clickable { filtersExpanded = !filtersExpanded }
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -243,9 +273,25 @@ fun SearchScreenContent(
                                 }
                             }
 
+                            val dateOptions = listOf(
+                                Pair(stringResource(R.string.filter_two_months), -60),
+                                Pair(stringResource(R.string.filter_today), -1),
+                                Pair(stringResource(R.string.filter_three_days_ago), -3),
+                                Pair(stringResource(R.string.filter_this_week), -7),
+                                Pair(stringResource(R.string.filter_this_month), -30)
+                            )
+                            val typeOptions = listOf(
+                                Pair(stringResource(R.string.pictures), JFile.Type.IMAGE),
+                                Pair(stringResource(R.string.audio), JFile.Type.AUDIO),
+                                Pair(stringResource(R.string.video), JFile.Type.VIDEO),
+                                Pair(stringResource(R.string.documents), JFile.Type.DOCUMENT),
+                                Pair(stringResource(R.string.installations), JFile.Type.APK),
+                                Pair(stringResource(R.string.compressed), JFile.Type.ARCHIVE)
+                            )
+
                             AnimatedVisibility(visible = filtersExpanded) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
-                                    if (category == "folder" && Statics.folder != null) {
+                                    if ((category == "folder" && Statics.folder != null) || category == "downloads") {
                                         Text(
                                             text = stringResource(R.string.location),
                                             fontWeight = FontWeight.Bold,
@@ -256,12 +302,37 @@ fun SearchScreenContent(
                                             onClick = { 
                                                 searchInFolder = !searchInFolder
                                                 if (searchInFolder) {
-                                                    viewModel.loadFiles(category, initialFiles, Statics.folder?.path)
+                                                    viewModel.loadFiles(
+                                                        category,
+                                                        initialFiles,
+                                                        if (category == "downloads") null else Statics.folder?.path
+                                                    )
                                                 } else {
                                                     viewModel.loadFiles("search", null, null)
                                                 }
                                             },
-                                            label = { Text("In ${Statics.folder!!.name}") },
+                                            label = {
+                                                if (category == "downloads") {
+                                                    Text(
+                                                        stringResource(
+                                                            R.string.search_in_folder,
+                                                            stringResource(R.string.downloads)
+                                                        )
+                                                    )
+                                                } else {
+                                                    val folderName =
+                                                        com.example.files.utils.PathFormatter(
+                                                            context
+                                                        ).format(Statics.folder!!.path).split("/")
+                                                            .last()
+                                                    Text(
+                                                        stringResource(
+                                                            R.string.search_in_folder,
+                                                            folderName
+                                                        )
+                                                    )
+                                                }
+                                            },
                                             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                                         )
                                     }
@@ -270,19 +341,6 @@ fun SearchScreenContent(
                                         text = stringResource(R.string.time_title),
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
-                                    )
-                                    val dateOptions = listOf(
-                                        Pair(stringResource(R.string.filter_today), -1),
-                                        Pair(stringResource(R.string.filter_three_days_ago), -3),
-                                        Pair(stringResource(R.string.filter_this_week), -7),
-                                        Pair(stringResource(R.string.filter_this_month), -30)
-                                    )
-                                    val typeOptions = listOf(
-                                        Pair(stringResource(R.string.pictures), JFile.Type.IMAGE),
-                                        Pair(stringResource(R.string.audio), JFile.Type.AUDIO),
-                                        Pair(stringResource(R.string.video), JFile.Type.VIDEO),
-                                        Pair(stringResource(R.string.documents), JFile.Type.DOCUMENT),
-                                        Pair(stringResource(R.string.installations), JFile.Type.APK)
                                     )
 
                                     LazyRow(
@@ -301,8 +359,21 @@ fun SearchScreenContent(
                                                         selectedDateLimit = daysOffset
                                                         viewModel.setDateFilter(getTimeOffset(daysOffset))
                                                     }
+                                                    if (category == "recent") {
+                                                        checkReload()
+                                                    }
                                                 },
-                                                label = { Text(label) }
+                                                label = { Text(label) },
+                                                leadingIcon = {
+                                                    if (uiState.isFiltering && selectedDateLimit == daysOffset) {
+                                                        androidx.compose.material3.CircularProgressIndicator(
+                                                            modifier = Modifier
+                                                                .padding(end = 4.dp)
+                                                                .size(16.dp),
+                                                            strokeWidth = 2.dp
+                                                        )
+                                                    }
+                                                }
                                             )
                                         }
                                     }
@@ -329,10 +400,152 @@ fun SearchScreenContent(
                                                             selectedType = type
                                                             viewModel.setTypeFilter(type)
                                                         }
+                                                        if (category != "recent" && category != "folder" && category != "downloads" && category != "search") {
+                                                            checkReload()
+                                                        }
                                                     },
-                                                    label = { Text(label) }
+                                                    label = { Text(label) },
+                                                    leadingIcon = {
+                                                        if (uiState.isFiltering && selectedType == type) {
+                                                            androidx.compose.material3.CircularProgressIndicator(
+                                                                modifier = Modifier
+                                                                    .padding(end = 4.dp)
+                                                                    .size(16.dp),
+                                                                strokeWidth = 2.dp
+                                                            )
+                                                        }
+                                                    }
                                                 )
                                             }
+                                        }
+                                    }
+                                }
+                            }
+
+                            AnimatedVisibility(visible = !filtersExpanded && hasActiveFilters) {
+                                LazyRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 5.dp, bottom = 10.dp),
+                                    contentPadding = PaddingValues(start = 6.dp, end = 16.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    stickyHeader {
+                                        Surface(color = cardContainerColor) {
+                                            FilledIconButton(
+                                                onClick = {
+                                                    if (searchInFolder) {
+                                                        searchInFolder = false
+                                                        viewModel.loadFiles("search", null, null)
+                                                    }
+                                                    if (selectedDateLimit != null) {
+                                                        selectedDateLimit = null
+                                                        viewModel.clearDateFilter()
+                                                    }
+                                                    if (selectedType != null) {
+                                                        selectedType = null
+                                                        viewModel.setTypeFilter(null)
+                                                    }
+                                                    if (category != "search") checkReload()
+                                                },
+                                                shape = CircleShape
+                                            ) {
+                                                Icon(
+                                                    Icons.Rounded.Close,
+                                                    contentDescription = "Clear All",
+                                                    tint = MaterialTheme.colorScheme.primaryContainer
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    if (searchInFolder) {
+                                        item {
+                                            FilterChip(
+                                                selected = true,
+                                                onClick = {
+                                                    searchInFolder = false
+                                                    viewModel.loadFiles("search", null, null)
+                                                },
+                                                label = {
+                                                    if (category == "downloads") {
+                                                        Text(
+                                                            stringResource(
+                                                                R.string.search_in_folder,
+                                                                stringResource(R.string.downloads)
+                                                            )
+                                                        )
+                                                    } else {
+                                                        val folderName =
+                                                            com.example.files.utils.PathFormatter(
+                                                                context
+                                                            ).format(Statics.folder!!.path)
+                                                                .split("/").last()
+                                                        Text(
+                                                            stringResource(
+                                                                R.string.search_in_folder,
+                                                                folderName
+                                                            )
+                                                        )
+                                                    }
+                                                },
+                                                trailingIcon = {
+                                                    Icon(
+                                                        Icons.Rounded.Close,
+                                                        contentDescription = "Remove",
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
+
+                                    if (selectedDateLimit != null) {
+                                        item {
+                                            val label =
+                                                dateOptions.find { it.second == selectedDateLimit }?.first
+                                                    ?: ""
+                                            FilterChip(
+                                                selected = true,
+                                                onClick = {
+                                                    selectedDateLimit = null
+                                                    viewModel.clearDateFilter()
+                                                    if (category == "recent") checkReload()
+                                                },
+                                                label = { Text(label) },
+                                                trailingIcon = {
+                                                    Icon(
+                                                        Icons.Rounded.Close,
+                                                        contentDescription = "Remove",
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
+
+                                    if (selectedType != null) {
+                                        item {
+                                            val label =
+                                                typeOptions.find { it.second == selectedType }?.first
+                                                    ?: ""
+                                            FilterChip(
+                                                selected = true,
+                                                onClick = {
+                                                    selectedType = null
+                                                    viewModel.setTypeFilter(null)
+                                                    if (category != "recent" && category != "folder" && category != "downloads" && category != "search") checkReload()
+                                                },
+                                                label = { Text(label) },
+                                                trailingIcon = {
+                                                    Icon(
+                                                        Icons.Rounded.Close,
+                                                        contentDescription = "Remove",
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                }
+                                            )
                                         }
                                     }
                                 }
@@ -344,7 +557,11 @@ fun SearchScreenContent(
 
             if (!uiState.isLoading && uiState.searchResults.isEmpty()) {
                 item {
-                    Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp), contentAlignment = Alignment.Center
+                    ) {
                         Text(stringResource(R.string.no_files_found), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }

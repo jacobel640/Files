@@ -27,8 +27,8 @@ val Icons.Rounded.CtgAudio: ImageVector
         val current = _ctgAudio
         if (current != null) return current
 
-        val primary = Icons.iconPrimary
-        val background = Icons.iconBackground
+        val primary = MaterialTheme.colorScheme.iconPrimary()
+        val background = MaterialTheme.colorScheme.iconBackground()
 
         return ImageVector.Builder(
             name = "MaterialTheme.CtgAudio",

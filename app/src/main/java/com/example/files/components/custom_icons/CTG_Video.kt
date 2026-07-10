@@ -25,8 +25,8 @@ val Icons.Rounded.CtgVideo: ImageVector
         val current = _ctgVideo
         if (current != null) return current
 
-        val primary = Icons.iconPrimary
-        val background = Icons.iconBackground
+        val primary = MaterialTheme.colorScheme.iconPrimary()
+        val background = MaterialTheme.colorScheme.iconBackground()
 
         return ImageVector.Builder(
             name = "MaterialTheme.CtgVideo",
@@ -39,7 +39,7 @@ val Icons.Rounded.CtgVideo: ImageVector
             path(
                 fill = SolidColor(primary),
                 pathFillType = PathFillType.EvenOdd,
-                stroke = SolidColor(background),
+                stroke = SolidColor(primary),
             ) {
                 // M 57.5 0
                 moveTo(x = 57.5f, y = 0.0f)

@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.files.R;
-import com.example.files.utils.DynamicColorUtils;
 import com.example.files.utils.ThemeManager;
 
 public abstract class BaseActivity extends AppCompatActivity {

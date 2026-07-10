@@ -30,7 +30,6 @@ import com.example.files.R;
 import com.example.files.databinding.ActivitySettingsBinding;
 import com.example.files.models.JFile;
 import com.example.files.models.SelfUpdate;
-import com.example.files.utils.DynamicColorUtils;
 import com.example.files.utils.MainActivityUtils.Storages;
 import com.example.files.utils.ThemeManager;
 import com.example.files.view.SelfUpdateSheet;
@@ -127,12 +126,12 @@ public class SettingsActivity extends BaseActivity {
                     .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
                     .density(20)
                     .setPositiveButton(context.getString(R.string.apply_theme_color), (dialog, selectedColor, allColors) -> {
-                        DynamicColorUtils.applyDynamicTheme(context, selectedColor);
+                        ThemeManager.applyDynamicTheme(context, selectedColor);
                         Snackbar.make(((SettingsActivity) requireActivity()).binding.getRoot(), R.string.aplying_dynamic_theme_message, BaseTransientBottomBar.LENGTH_SHORT).show();
                         new Handler().postDelayed(() -> restartApp(context),1000);
                     })
                     .setNegativeButton(context.getString(R.string.reset_default_theme_color), (dialog, which) -> {
-                        DynamicColorUtils.applyDynamicTheme(context, R.color.app_theme);
+                        ThemeManager.applyDynamicTheme(context, R.color.app_theme);
                         new Handler().postDelayed(() -> restartApp(context),1000);
                     })
 //                    .setNegativeButton(context.getString(R.string.cancel), (dialog, which) -> dialog.dismiss())

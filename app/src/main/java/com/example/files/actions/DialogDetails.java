@@ -192,11 +192,13 @@ public class DialogDetails extends BottomSheetDialog {
                     items.get(PATH).getTvContent().setTextColor(activity.getColor(R.color.app_theme));
                     items.get(PATH).setOnClickListener(v ->
                             items.get(PATH).showPopupView(activity.getString(R.string.confirm_move_to_location),
-                            activity.getString(R.string.move_to_location),
+                                    activity.getString(R.string.move_to_location),
                                     () -> {
                                         dismiss();
-                                        openFolder(file.getParentFile());
-                                        currentFragment.select(file.getPath());
+                                        if (currentFragment != null) {
+                                            currentFragment.clearSelection();
+                                        }
+                                        openFolder(file.getParentFile(), file.getPath());
                                     }));
                 }
 
