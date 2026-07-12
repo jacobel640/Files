@@ -294,7 +294,7 @@ class FilesViewModel @Inject constructor() : ViewModel() {
 
     private fun updateSelection(selected: List<JFile>) {
         val allFavs = if (selected.isEmpty()) false else selected.all { file ->
-            Statics.favorites.allPaths.any { fav -> fav.path == file.path }
+            Statics.favorites!!.allPaths.any { fav -> fav.path == file.path }
         }
         _uiState.value = _uiState.value.copy(
             selectedFiles = selected,
@@ -304,18 +304,25 @@ class FilesViewModel @Inject constructor() : ViewModel() {
         Statics.selectedJFiles.clear()
         Statics.selectedJFiles.addAll(selected)
         Statics.multiSelected = selected.isNotEmpty()
+        if (selected.isEmpty()) {
+            if (!Statics.copyMode) {
+                com.example.files.MainActivity.actionBarVisibility(android.view.View.GONE)
+            }
+        } else {
+            com.example.files.MainActivity.actionBarVisibility(android.view.View.VISIBLE)
+        }
     }
 
     fun toggleFavorite(context: Context) {
         val selected = _uiState.value.selectedFiles
         if (_uiState.value.isAllSelectedFavorites) {
             selected.forEach { file ->
-                val fav = Statics.favorites.allPaths.find { it.path == file.path }
-                if (fav != null) Statics.favorites.deletePath(fav.id)
+                val fav = Statics.favorites!!.allPaths.find { it.path == file.path }
+                if (fav != null) Statics.favorites!!.deletePath(fav.id)
             }
         } else {
             selected.forEach { file ->
-                Statics.favorites.addToFavorites(file)
+                Statics.favorites!!.addToFavorites(file)
             }
         }
         updateSelection(selected)

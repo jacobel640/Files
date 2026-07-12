@@ -211,7 +211,7 @@ public abstract class DialogBase extends DialogProgress {
         if (type == Copy || type == Move)
             ((TextView) actionBar.findViewById(R.id.copy_here)).setText(activity.getText(resAction));
 
-        textBtnState(currentFragment.isFilesType() && hasCircularCopyConflict());
+        textBtnState(currentFragment.isFilesType() && !hasCircularCopyConflict());
         ((TextView) actionBar.findViewById(R.id.items)).setText(countItems(activity, jFiles.size()));
         actionBar.findViewById(R.id.copy_dialog).setVisibility(View.VISIBLE);
         copyMode = true;

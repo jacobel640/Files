@@ -10,3 +10,7 @@
 /app/release/
 /diff.txt
 /diff_utf8.txt
+
+# AI
+/docs
+/.agents

@@ -212,6 +212,27 @@ public class MainActivity extends BaseActivity {
         });
 
         getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            java.util.List<androidx.fragment.app.Fragment> fragments = getSupportFragmentManager().getFragments();
+            if (!fragments.isEmpty()) {
+                androidx.fragment.app.Fragment topFragment = fragments.get(fragments.size() - 1);
+                if (topFragment instanceof com.example.files.presentation.files_explorer.FilesFragment) {
+                    currentFragment = (com.example.files.presentation.files_explorer.FilesFragment) topFragment;
+                    android.os.Bundle args = currentFragment.getArguments();
+                    if (args != null) {
+                        String path = args.getString("FILE_PATH");
+                        if (path != null) {
+                            folder = new File(path);
+                        } else {
+                            String zippedPath = args.getString("ZIPPED_FILE_PATH");
+                            if (zippedPath != null) {
+                                folder = new File(zippedPath);
+                            }
+                        }
+                    }
+                }
+            }
+            textBtnState(enableTextButton());
+
             if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
                 homeScreenRefresh();
                 folder = new File("");

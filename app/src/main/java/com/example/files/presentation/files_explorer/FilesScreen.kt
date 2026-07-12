@@ -202,9 +202,9 @@ class FilesFragment : Fragment() {
     fun refreshActionsList() {}
     fun setListeners() {}
 
-    fun isFilesType(): Boolean = true
+    fun isFilesType(): Boolean = mode is FilesMode.Normal
     
-    fun isTypeFiles(): Boolean = true
+    fun isTypeFiles(): Boolean = mode is FilesMode.Normal
 
     @JvmField
     var isArchive: Boolean = false
@@ -229,16 +229,26 @@ class FilesFragment : Fragment() {
                     filesViewModel.clearSelection()
                 }
             }
-            override fun onRefresh() {}
+            override fun onRefresh() {
+                refresh()
+            }
             override fun onRefreshActionsList() {}
         })
     }
 
     override fun onResume() {
         super.onResume()
+        setListListener()
         if (filesViewModel.uiState.value.files.isEmpty()) {
             loadList()
         }
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            try {
+                com.example.files.MainActivity.textBtnState(com.example.files.MainActivity.enableTextButton())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }, 100)
     }
 }
 
@@ -539,7 +549,7 @@ fun FilesScreen(
                                     })
                                     DropdownMenuItem(text = { Text(stringResource(R.string.add_to_favorites)) }, onClick = { 
                                         menuExpanded = false
-                                        uiState.selectedFiles.forEach { Statics.favorites.addToFavorites(it) }
+                                        uiState.selectedFiles.forEach { Statics.favorites!!.addToFavorites(it) }
                                         viewModel.clearSelection()
                                     })
                                     DropdownMenuItem(text = { Text(stringResource(R.string.share)) }, onClick = { 
