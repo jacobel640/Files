@@ -5,16 +5,34 @@ plugins {
 
 apply plugin: 'com.jakewharton.butterknife'
 
+// Release signing credentials are read from keystore.properties (kept out of git)
+// or from environment variables, so no secret is ever committed to the repository.
+// See keystore.properties.example for the expected keys.
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
+def signingValue = { String key, String envKey ->
+    keystoreProperties.getProperty(key) ?: System.getenv(envKey)
+}
+
+def keystorePath = signingValue('storeFile', 'FILES_KEYSTORE_FILE')
+def hasReleaseSigning = keystorePath != null && !keystorePath.isEmpty() && file(keystorePath).exists()
+
 android {
     namespace 'com.example.files'
     compileSdk 35
 
     signingConfigs {
-        release {
-            storeFile file('/home/jacob/AndroidStudioProjects/key.jks')
-            storePassword '123456'
-            keyAlias 'key'
-            keyPassword '123456'
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(keystorePath)
+                storePassword signingValue('storePassword', 'FILES_KEYSTORE_PASSWORD')
+                keyAlias signingValue('keyAlias', 'FILES_KEY_ALIAS')
+                keyPassword signingValue('keyPassword', 'FILES_KEY_PASSWORD')
+            }
         }
     }
 
@@ -33,6 +51,10 @@ android {
             manifestPlaceholders
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
         debug {
             // TODO change package name
